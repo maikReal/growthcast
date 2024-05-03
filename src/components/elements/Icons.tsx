@@ -1,3 +1,5 @@
+import "./styles.css"
+
 export const iconsFoAnalytics = (iconType: string) => {
   const iconsMapper: IconsMapperInterface = {
     followersIcon: (
@@ -252,6 +254,47 @@ export const OpenButtonArros = () => {
         stroke-linejoin="round"
         stroke-width="2"
         d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
+    </svg>
+  )
+}
+
+export const PlusIcon = ({ bgColor, strokeColor }) => {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg">
+      <circle cx="10" cy="10" r="10" fill={bgColor} />
+      <path
+        d="M4.66699 9.66669H14.667M9.66699 4.66669V14.6667"
+        stroke={strokeColor}
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  )
+}
+
+export const MinusIcon = ({ opacity }) => {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg">
+      <circle cx="10" cy="10" r="10" fill="#FF1F3E" fill-opacity={opacity} />
+      <path d="M5 10H15H5Z" fill="#FF1F3E" fill-opacity={opacity} />
+      <path
+        d="M5 10H15"
+        stroke="white"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
     </svg>
   )
 }

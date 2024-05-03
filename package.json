@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.3.6",
+    "@headlessui/react": "^1.7.19",
     "@neynar/nodejs-sdk": "^1.16.1",
     "antd": "^5.16.4",
     "axios": "^1.6.8",

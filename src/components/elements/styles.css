@@ -1,0 +1,7 @@
+.circle-progress {
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    transition: stroke-dashoffset 0.35s;
+    stroke-linecap: round; /* This makes the progress bar have rounded edges */
+  }
+  

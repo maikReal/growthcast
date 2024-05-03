@@ -67,3 +67,8 @@ interface DataType {
   recasts: number
   linkToCast: string
 }
+
+interface ThreadData {
+  threadContent: Array<string>
+  channel: string
+}

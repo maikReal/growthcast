@@ -7,9 +7,11 @@ import { OverlayLayer } from "~components/sections/OverlayLayer"
 import { AppProvider } from "~Context/AppContext"
 
 const sidebarId = "my-extension-sidebar"
+const warpcastURL = "https://warpcast.com"
 
 // Check if the sidebar is already present
-if (!document.getElementById(sidebarId)) {
+if (!document.getElementById(sidebarId) && document.URL.includes(warpcastURL)) {
+  console.log("rendering content script")
   // Create a new div that will host your React component
   const appDiv = document.createElement("div")
   const body = document.querySelector("body")

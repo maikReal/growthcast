@@ -13,6 +13,7 @@ import { toast } from "react-toastify"
 
 import { useStorage } from "@plasmohq/storage/hook"
 
+import type { AppContextInterface, Props, UserInfo, UserStat } from "~types"
 import { getUserAnalytics } from "~utils/proxy"
 
 export enum ScreenState {
@@ -28,6 +29,7 @@ export const AppProvider: FC<Props> = ({ children }) => {
   const [pfp, setPfp] = useState<string | null>(null)
   const [signerUuid, setSignerUuid] = useState<string | null>(null)
   const [fid, setFid] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
 
   const [userAnalytics, setUserAnalytics] = useState<UserStat | null>(null)
 
@@ -48,6 +50,7 @@ export const AppProvider: FC<Props> = ({ children }) => {
       try {
         setFid(user.fid.toString())
         setSignerUuid(user.signerUuid.toString())
+        setLoading(false)
       } catch (err) {
         const axiosError = err as AxiosError<ErrorRes>
         console.log(axiosError.response?.data.message)
@@ -101,7 +104,8 @@ export const AppProvider: FC<Props> = ({ children }) => {
       fid,
       setFid,
       userAnalytics,
-      setUserAnalytics
+      setUserAnalytics,
+      loading
     }),
     [screen, displayName, pfp, signerUuid, fid, userAnalytics]
   )

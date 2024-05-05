@@ -1,8 +1,9 @@
-import React, { useState, type ChangeEvent } from "react"
+import React, { useMemo, useState, type ChangeEvent } from "react"
 import styled from "styled-components"
 
 import { ThreadContent } from "~components/elements/thread/ThreadContent"
 import { ThreadHeader } from "~components/elements/thread/ThreadHeader"
+import { useApp } from "~Context/AppContext"
 
 import { BasicLayer } from "./BasicLayer"
 
@@ -16,6 +17,12 @@ export const ThreadView: React.FC = () => {
     { value: "", minimized: false }
   ])
   const [inputsLength, setInputsLength] = useState(0)
+  const { fid, loading } = useApp()
+  console.log("Myid: ", fid)
+  // const fid = 3
+
+  // TODO: Add fetch channels and link it to 30 mins interval
+  // useMemo
 
   const handleCastThread = () => {
     console.log("Casting a thread with content:", inputs)
@@ -44,18 +51,25 @@ export const ThreadView: React.FC = () => {
       setInputs(newInputs)
     }
 
+  console.log("In threads")
   return (
     <BasicLayer>
       <Container>
-        <ThreadHeader handleCastThread={handleCastThread} />
-        <ThreadContent
-          handleAddInput={handleAddInput}
-          handleInputChange={handleInputChange}
-          inputs={inputs}
-          handleRemoveInput={handleRemoveInput}
-          setInputs={setInputs}
-          inputsLength={inputsLength}
-        />
+        {loading ? (
+          <div>Loading context, pls wait </div>
+        ) : (
+          <>
+            <ThreadHeader handleCastThread={handleCastThread} fid={fid} />
+            <ThreadContent
+              handleAddInput={handleAddInput}
+              handleInputChange={handleInputChange}
+              inputs={inputs}
+              handleRemoveInput={handleRemoveInput}
+              setInputs={setInputs}
+              inputsLength={inputsLength}
+            />
+          </>
+        )}
       </Container>
     </BasicLayer>
   )

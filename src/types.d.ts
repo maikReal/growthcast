@@ -40,6 +40,7 @@ interface AppContextInterface {
   setFid: SetState<string | null>
   userAnalytics: UserStat | null
   setUserAnalytics: SetState<UserStat | null>
+  loading: boolean
 }
 
 interface UserAnalyticsProps {
@@ -71,4 +72,14 @@ interface DataType {
 interface ThreadData {
   threadContent: Array<string>
   channel: string
+}
+
+export interface Channel {
+  channelName?: string
+  channelId: string
+}
+
+export interface ChannelSelect {
+  value: string
+  label: string
 }

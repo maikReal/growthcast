@@ -2,11 +2,11 @@ import styled from "styled-components"
 
 import { useApp } from "~Context/AppContext"
 
-import { Description } from "./elements/DescriptionComponent"
-import { Title } from "./elements/TitleComponent"
-import { UserAnalytics } from "./sections/Analytics"
-import { BasicLayer } from "./sections/BasicLayer"
-import StatTable from "./sections/CastsStatTable"
+import { Description } from "../elements/DescriptionComponent"
+import { Title } from "../elements/TitleComponent"
+import { UserAnalytics } from "../sections/Analytics"
+import { BasicLayer } from "../sections/BasicLayer"
+import StatTable from "../sections/CastsStatTable"
 
 export const MyStatistic = () => {
   const { userAnalytics } = useApp()
@@ -16,8 +16,11 @@ export const MyStatistic = () => {
       {userAnalytics ? (
         <BasicLayer>
           <PageDescription>
-            <Title content="My stat" />
-            <Description content="All statistics by default is for last 7 days and relates to your profile" />
+            <Title>My stat</Title>
+            <Description>
+              All statistics by default is for last 7 days and relates to your
+              profile
+            </Description>
           </PageDescription>
           <UserAnalytics prop={userAnalytics} />
           <StatTable casts={userAnalytics.casts} />

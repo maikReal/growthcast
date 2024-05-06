@@ -5,7 +5,9 @@ import styled from "styled-components"
 import type { ChannelSelect } from "~types"
 import { getChannels } from "~utils/proxy"
 
-export const ThreadHeader = ({ handleCastThread, fid }) => {
+import { PrimaryButton } from "../PrimaryButton"
+
+export const ThreadHeader = ({ handleCastThread, fid, setSelectedChannel }) => {
   const [channels, setChannels] = useState<Array<ChannelSelect>>(null)
   const [isSearchUsed, setIsSearchUsed] = useState(false)
 
@@ -16,8 +18,8 @@ export const ThreadHeader = ({ handleCastThread, fid }) => {
       setChannels(
         apiChannels.map((channel) => {
           return {
-            label: channel.channelId,
-            value: channel.channelName
+            label: channel.channelName,
+            value: channel.channelId
           }
         })
       )
@@ -34,7 +36,14 @@ export const ThreadHeader = ({ handleCastThread, fid }) => {
       if (!lastFetchTime || now - parseInt(lastFetchTime) > apiRequestTimeout) {
         updateWarpcastChannels()
       } else {
-        setChannels(JSON.parse(localStorage.getItem("channels")))
+        setChannels(
+          JSON.parse(localStorage.getItem("channels")).map((channel) => {
+            return {
+              label: channel.channelName,
+              value: channel.channelId
+            }
+          })
+        )
       }
     }
   }, [])
@@ -50,6 +59,11 @@ export const ThreadHeader = ({ handleCastThread, fid }) => {
     } else {
       setIsSearchUsed(false)
     }
+  }
+
+  const handleSelect = (value) => {
+    console.log("Selected value is: ", value)
+    setSelectedChannel(value)
   }
 
   return (
@@ -79,10 +93,13 @@ export const ThreadHeader = ({ handleCastThread, fid }) => {
           }
           filterOption={filterOption}
           variant={"borderless"}
+          onSelect={handleSelect}
           virtual={false}
           loading={channels ? false : true}></Select>
       </ConfigProvider>
-      <CastButton onClick={handleCastThread}>Cast a thread</CastButton>
+      <PrimaryButton handleClick={handleCastThread}>
+        {"Cast a thread"}
+      </PrimaryButton>
     </ThreadHeaderContainer>
   )
 }
@@ -90,20 +107,4 @@ export const ThreadHeader = ({ handleCastThread, fid }) => {
 const ThreadHeaderContainer = styled.div`
   display: flex;
   justify-content: space-between;
-`
-
-const CastButton = styled.button`
-  background-color: #bb96f9;
-  color: #ffffff;
-  font-size: 12px;
-  border-radius: 25px;
-  padding: 9px 18px;
-  font-weight: 600;
-  font-family: "Poppins", sans-serif;
-  border: 0px;
-
-  &:hover {
-    background-color: rgb(187, 150, 249, 0.8);
-    color: rgb(249, 249, 249, 0.8);
-  }
 `

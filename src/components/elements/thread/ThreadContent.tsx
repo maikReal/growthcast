@@ -47,7 +47,6 @@ export const ThreadContent = ({
               key={index}
               onBlur={handleBlur(index)}
               onFocus={handleActiveInput(index)}
-              //   onClick={handleActiveInput(index)}
               style={{ opacity: input.minimized ? 0.5 : 1 }}>
               <ContentContainer key={index}>
                 <ProfileImage src="https://i.imgur.com/7txHbJC.jpg" />

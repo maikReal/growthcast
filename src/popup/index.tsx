@@ -1,5 +1,6 @@
-import { Main } from "~components/main"
-import { ThreadView } from "~components/sections/ThreadView"
+import { Main } from "~components/screens/main"
+import { SuccessScreen } from "~components/screens/SuccessScreen"
+import { ThreadView } from "~components/screens/ThreadView"
 import { AppProvider, useApp } from "~Context/AppContext"
 
 function IndexPopup() {
@@ -7,8 +8,12 @@ function IndexPopup() {
   return (
     <AppProvider>
       {/* TODO: Remove the ThreadView component and enable Main component */}
-      <ThreadView />
-      {/* <Main /> */}
+      {/* <ThreadView /> */}
+      {/* <SuccessScreen
+        title={"Thread sent"}
+        description={"Your thread was successfully casted!"}
+      /> */}
+      <Main />
     </AppProvider>
   )
 }

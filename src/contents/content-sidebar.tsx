@@ -2,7 +2,7 @@ import React from "react"
 import { createRoot } from "react-dom/client"
 
 // Import your React component
-import { Main } from "~components/main"
+import { Main } from "~components/screens/main"
 import { OverlayLayer } from "~components/sections/OverlayLayer"
 import { AppProvider } from "~Context/AppContext"
 

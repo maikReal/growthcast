@@ -4,8 +4,6 @@ import styled from "styled-components"
 import { MinusIcon, PlusIcon } from "~components/elements/Icons"
 import CircleProgress from "~components/elements/thread/CircleProgress"
 
-const MAX_THREADS_NUMBER = 3
-
 export const ThreadFooterButtons = ({
   input,
   handleAddInput,
@@ -22,7 +20,8 @@ export const ThreadFooterButtons = ({
           <CircleProgress value={input.value.length} maxValue={200} />
 
           {index == inputsLength &&
-            inputsLength + 1 !== MAX_THREADS_NUMBER &&
+            inputsLength + 1 !==
+              process.env.PLASMO_PUBLIC_MAX_CASTS_IN_THREAD &&
             input.value && (
               <FooterActionButtonContainer
                 setIsHovered={setIsHovered}

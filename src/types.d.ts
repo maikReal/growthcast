@@ -70,8 +70,15 @@ interface DataType {
 }
 
 interface ThreadData {
-  threadContent: Array<string>
-  channel: string
+  signerUuid: string
+  content: Array<ThreadInput>
+  channelId: string
+}
+
+export interface ThreadInput {
+  uuid: string
+  order: number
+  text: string
 }
 
 export interface Channel {
@@ -82,4 +89,9 @@ export interface Channel {
 export interface ChannelSelect {
   value: string
   label: string
+}
+
+export interface InputState {
+  value: string
+  minimized: boolean
 }

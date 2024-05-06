@@ -18,7 +18,10 @@ import { getUserAnalytics } from "~utils/proxy"
 
 export enum ScreenState {
   Signin = "signin",
-  Home = "home"
+  Home = "home",
+  Settings = "settings",
+  Thread = "thread",
+  ThreadSentSuccess = "threadSent"
 }
 
 const AppContext = createContext<AppContextInterface | null>(null)

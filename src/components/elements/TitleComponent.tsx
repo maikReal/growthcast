@@ -1,7 +1,7 @@
 import styled from "styled-components"
 
-export const Title = ({ content }) => {
-  return <TitleComponent>{content}</TitleComponent>
+export const Title = ({ children }) => {
+  return <TitleComponent>{children}</TitleComponent>
 }
 
 const TitleComponent = styled.span`

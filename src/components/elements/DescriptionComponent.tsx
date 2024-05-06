@@ -1,7 +1,7 @@
 import styled from "styled-components"
 
-export const Description = ({ content }) => {
-  return <DescriptionComponent>{content}</DescriptionComponent>
+export const Description = ({ children }) => {
+  return <DescriptionComponent>{children}</DescriptionComponent>
 }
 
 const DescriptionComponent = styled.span`

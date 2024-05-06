@@ -1,4 +1,8 @@
 import crypto from "crypto"
+import { v4 as uuidv4 } from "uuid"
+
+import type { ThreadContent } from "~components/elements/thread/ThreadContent"
+import type { InputState } from "~types"
 
 const algorithm = "aes-256-cbc"
 
@@ -32,4 +36,14 @@ export const contentDecryptor = (hash: string) => {
   let decrypted = decipher.update(Buffer.from(hash, "hex"))
   decrypted = Buffer.concat([decrypted, decipher.final()])
   return decrypted.toString()
+}
+
+export const prepareInputsForThreadCast = (inputs: InputState[]) => {
+  return inputs.map((input, index) => {
+    return {
+      order: index + 1,
+      text: input.value,
+      uuid: uuidv4()
+    }
+  })
 }

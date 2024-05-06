@@ -3,30 +3,39 @@ import styled from "styled-components"
 
 import { ThreadContent } from "~components/elements/thread/ThreadContent"
 import { ThreadHeader } from "~components/elements/thread/ThreadHeader"
-import { useApp } from "~Context/AppContext"
+import { ScreenState, useApp } from "~Context/AppContext"
+import type { InputState, ThreadInput } from "~types"
+import { prepareInputsForThreadCast } from "~utils/helpers"
+import { castThread } from "~utils/proxy"
 
-import { BasicLayer } from "./BasicLayer"
-
-interface InputState {
-  value: string
-  minimized: boolean
-}
+import { BasicLayer } from "../sections/BasicLayer"
 
 export const ThreadView: React.FC = () => {
   const [inputs, setInputs] = useState<InputState[]>([
     { value: "", minimized: false }
   ])
   const [inputsLength, setInputsLength] = useState(0)
-  const { fid, loading } = useApp()
-  console.log("Myid: ", fid)
-  // const fid = 3
+  const [selectedChannel, setSelectedChannel] = useState<string | null>(null)
+  const { fid, signerUuid, loading, setScreen } = useApp()
 
-  // TODO: Add fetch channels and link it to 30 mins interval
-  // useMemo
-
-  const handleCastThread = () => {
+  const handleCastThread = async () => {
     console.log("Casting a thread with content:", inputs)
-    // Implement API call here
+
+    if (inputs && inputs.length > 1) {
+      const preparedDataForThread: Array<ThreadInput> =
+        prepareInputsForThreadCast(inputs)
+
+      const castThreadResponse = await castThread({
+        content: preparedDataForThread,
+        channelId: selectedChannel,
+        signerUuid: signerUuid
+      })
+
+      // TODO: Add error screen
+      if (castThreadResponse.castHash) {
+        setScreen(ScreenState.ThreadSentSuccess)
+      }
+    }
   }
 
   const handleAddInput = () => {
@@ -59,7 +68,11 @@ export const ThreadView: React.FC = () => {
           <div>Loading context, pls wait </div>
         ) : (
           <>
-            <ThreadHeader handleCastThread={handleCastThread} fid={fid} />
+            <ThreadHeader
+              handleCastThread={handleCastThread}
+              fid={fid}
+              setSelectedChannel={setSelectedChannel}
+            />
             <ThreadContent
               handleAddInput={handleAddInput}
               handleInputChange={handleInputChange}

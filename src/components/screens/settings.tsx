@@ -1,8 +1,8 @@
 import { useStorage } from "@plasmohq/storage/hook"
 
-import { useApp } from "~Context/AppContext"
+import { ScreenState, useApp } from "~Context/AppContext"
 
-export function Home() {
+export function Settings() {
   const { pfp, displayName, fid, signerUuid } = useApp()
   const [_, _1, removeUser] = useStorage<UserInfo>("user-data")
 

@@ -1,13 +1,19 @@
 import styled from "styled-components"
 
+import { ScreenState } from "~Context/AppContext"
+
 import { SecretCastIcon, ThreadIcon } from "./Icons"
 
-export const OpenedFloatButton = ({ content, type }) => {
+export const OpenedFloatButton = ({ content, type, handleClick }) => {
+  const handleFloatButtonClick = () => {
+    handleClick(type)
+  }
+
   return (
-    <Button>
-      {type === "secret" ? (
+    <Button onClick={handleFloatButtonClick}>
+      {type === ScreenState.SecretMessages ? (
         <SecretCastIcon />
-      ) : type === "thread" ? (
+      ) : type === ScreenState.Thread ? (
         <ThreadIcon />
       ) : (
         ""
@@ -27,12 +33,14 @@ const Button = styled.button`
   padding: 10px 15px;
   font-family: "Poppins", sans-serif;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 600;
   background-color: #ffffff;
   border-radius: 21px;
   transition: background-color 0.3s;
+  border: 0px;
 
   &:hover {
-    opacity: 70%;
+    background-color: #000000;
+    color: #ffffff;
   }
 `

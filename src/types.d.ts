@@ -41,6 +41,8 @@ interface AppContextInterface {
   userAnalytics: UserStat | null
   setUserAnalytics: SetState<UserStat | null>
   loading: boolean
+  setIsBackendLoggedIn: SetState<boolean | null>
+  isBackendLoggedIn: boolean
 }
 
 interface UserAnalyticsProps {
@@ -94,4 +96,21 @@ export interface ChannelSelect {
 export interface InputState {
   value: string
   minimized: boolean
+}
+
+export interface RequestData {
+  fid: string
+  signerUuid?: string
+  metadata: {
+    [key: string | number]: Object
+  }
+}
+
+export interface JwtPayload {
+  fid: string
+  metadata?: {
+    [key: string | number]: Object
+  }
+  iat: number
+  exp: number
 }

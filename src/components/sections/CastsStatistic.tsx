@@ -2,6 +2,8 @@ import { ConfigProvider, Table, Tooltip } from "antd"
 import type { TableProps } from "antd"
 import React from "react"
 
+import type { DataType } from "~types"
+
 const columns: TableProps<DataType>["columns"] = [
   {
     title: "Cast",
@@ -32,7 +34,7 @@ const columns: TableProps<DataType>["columns"] = [
   }
 ]
 
-const StatTable: React.FC<StatTableProp> = ({ casts }) => {
+const CastsStatistic = ({ casts }) => {
   const castsWithkeys = casts.map((item, index) => ({
     ...item,
     key: String(index + 1)
@@ -69,4 +71,4 @@ const StatTable: React.FC<StatTableProp> = ({ casts }) => {
   )
 }
 
-export default StatTable
+export default CastsStatistic

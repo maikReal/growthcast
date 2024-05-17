@@ -1,65 +1,102 @@
 import type { Channel, ThreadData, UserStat } from "~types"
 
-import { contentEncrypter } from "./helpers"
+import AuthService from "./authService"
 
-export const getUserAnalytics = async (fid: string): Promise<UserStat> => {
-  // TODO: Use auth key here for all requests
-  // TODO: Dynamic host env
+export const getUserAnalytics = async (fid: string, token: string) => {
+  const fetchAnalytics = async () => {
+    return await fetch(`${process.env.PLASMO_PUBLIC_DOMAIN}/api/stat/${fid}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+  }
 
-  // let encryptedBody = contentEncrypter(encryptedContent)
+  let response = await fetchAnalytics()
 
-  // let encryoptedHeaderKey = contentEncrypter("fid123" + "_" + "1234Token")
-  const encryoptedHeaderKey = "somekey"
+  if (response.status === 403) {
+    console.log(
+      `[DEBUG - utils/proxy.ts] JWT token is expired during the request to /api/stat/${fid}, trying to refresh it. Previous error: `,
+      response.status,
+      response.statusText
+    )
+    await AuthService.refreshToken()
+    response = await fetchAnalytics()
+  }
 
-  // TODO: Enable sernding a header with a auth key (CORS)
-  const response = await fetch(
-    `${process.env.PLASMO_PUBLIC_DOMAIN}/api/stat/${fid}`
-  )
   if (!response.ok) {
-    throw new Error("Network response was not ok")
+    throw new Error(
+      `[DEBUG - utils/proxy.ts] The external method /api/stat/${fid} returned a bad HTTP status: ${response.status} -> ${response.statusText}`
+    )
   }
   const data: UserStat = await response.json()
-
-  console.log(data)
 
   return data
 }
 
-export const castThread = async (data: ThreadData) => {
-  const encryoptedHeaderKey = "somekey"
-
-  const response = await fetch(
-    `${process.env.PLASMO_PUBLIC_DOMAIN}/api/thread/`,
-    {
+export const castThread = async (data: ThreadData, token: string) => {
+  const makeThreadCast = async () => {
+    return await fetch(`${process.env.PLASMO_PUBLIC_DOMAIN}/api/thread/`, {
       method: "POST",
       body: JSON.stringify(data),
-      headers: {}
-    }
-  )
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+  }
+
+  let response = await makeThreadCast()
+
+  if (response.status === 403) {
+    console.log(
+      `[DEBUG - utils/proxy.ts] JWT token is expired during the request to /api/thread, trying to refresh it. Previous error: `,
+      response.status,
+      response.statusText
+    )
+    await AuthService.refreshToken()
+    response = await makeThreadCast()
+  }
+
   if (!response.ok) {
-    throw new Error("Network response was not ok")
+    throw new Error(
+      `[DEBUG - utils/proxy.ts] The external method /api/thread/ returned a bad HTTP status: ${response.status} -> ${response.statusText}`
+    )
   }
   const threadPostResponse: Promise<{ frameLink: string; castHash: string }> =
     await response.json()
 
-  console.log(data)
-
   return threadPostResponse
 }
 
-export const getChannels = async (fid: string) => {
-  const encryoptedHeaderKey = "somekey"
+export const getChannels = async (fid: string, token: string) => {
+  const fetchChannels = async () => {
+    return await fetch(
+      `${process.env.PLASMO_PUBLIC_DOMAIN}/api/channels/${fid}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    )
+  }
 
-  // TODO: Enable sernding a header with a auth key (CORS)
-  const response = await fetch(
-    `${process.env.PLASMO_PUBLIC_DOMAIN}/api/channels/${fid}`
-  )
+  let response = await fetchChannels()
+
+  if (response.status === 403) {
+    console.log(
+      `[DEBUG - utils/proxy.ts] JWT token is expired during the request to /api/channels/${fid}, trying to refresh it. Previous error: `,
+      response.status,
+      response.statusText
+    )
+    await AuthService.refreshToken()
+    response = await fetchChannels()
+  }
+
   if (!response.ok) {
-    throw new Error("Network response was not ok")
+    throw new Error(
+      `[DEBUG - utils/proxy.ts] The external method /api/channels/${fid} returned a bad HTTP status: ${response.status} -> ${response.statusText}`
+    )
   }
   const data: Array<Channel> = await response.json()
-
-  console.log(data)
 
   return data
 }

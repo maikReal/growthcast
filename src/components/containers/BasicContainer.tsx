@@ -1,6 +1,8 @@
 import styled from "styled-components"
 
-export const BasicLayer = ({ children }: Props) => {
+import type { Props } from "~types"
+
+export const BasicContainer = ({ children }: Props) => {
   return <Layer>{children}</Layer>
 }
 

@@ -4,24 +4,31 @@ import React from "react"
 import { OpenedFloatButton } from "./FloatButtonOpened"
 import { CloseIcon, RocketIcon } from "./Icons"
 
-export const CustomFloatButton: React.FC = () => (
+export const CustomFloatButton = ({ handleSetScreen }) => (
   <>
     <ConfigProvider
       theme={{
         token: {
-          // Seed Token
-          colorPrimary: "#DCD8EA"
+          colorPrimary: "#FFFFFF"
         }
       }}>
       <FloatButton.Group
         trigger="click"
         type="primary"
         shape="circle"
-        style={{ right: "315px" }}
+        style={{ position: "absolute", left: "55px" }}
         icon={<RocketIcon />}
         closeIcon={<CloseIcon />}>
-        <OpenedFloatButton content={"Secret"} type={"secret"} />
-        <OpenedFloatButton content={"Threads"} type={"thread"} />
+        <OpenedFloatButton
+          handleClick={handleSetScreen}
+          content={"Secret"}
+          type={"secret"}
+        />
+        <OpenedFloatButton
+          handleClick={handleSetScreen}
+          content={"Threads"}
+          type={"thread"}
+        />
       </FloatButton.Group>
     </ConfigProvider>
   </>

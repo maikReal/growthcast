@@ -17,8 +17,10 @@
     "@ant-design/icons": "^5.3.6",
     "@headlessui/react": "^1.7.19",
     "@neynar/nodejs-sdk": "^1.16.1",
+    "@types/jsonwebtoken": "^9.0.6",
     "antd": "^5.16.4",
     "axios": "^1.6.8",
+    "jsonwebtoken": "^9.0.2",
     "next": "14.1.0",
     "node-fetch": "^3.3.2",
     "plasmo": "0.85.2",
@@ -47,7 +49,8 @@
   },
   "manifest": {
     "host_permissions": [
-      "https://*/*"
+      "https://*/*",
+      "http://*/"
     ],
     "permissions": [
       "tabs",
@@ -55,6 +58,8 @@
       "activeTab",
       "windows",
       "scripting",
+      "background",
+      "identity",
       "http://localhost:3000/*"
     ],
     "content_scripts": [
@@ -74,6 +79,9 @@
           "../src/contents/content-sidebar.tsx"
         ]
       }
-    ]
+    ],
+    "background": {
+      "service_worker": "../src/background.ts"
+    }
   }
 }

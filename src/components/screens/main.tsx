@@ -1,23 +1,22 @@
 import { ScreenState, useApp } from "~Context/AppContext"
 
+import { UserHome } from "./home"
 import { Settings } from "./settings"
 import { Signin } from "./signin"
-import { MyStatistic } from "./statistic"
 import { SuccessScreen } from "./SuccessScreen"
 import { ThreadView } from "./ThreadView"
 
-export function Main() {
+export function AppMain() {
   const { screen, fid, signerUuid } = useApp()
 
-  console.log("[DEBUG] Current screen:", screen)
-  console.log("[DEBUG] Current values: ", fid, signerUuid)
+  console.log("[DEBUG - screens/Main.tsx] Current screen:", screen)
 
   if (screen === ScreenState.Signin) {
     return <Signin />
   }
 
   if (screen === ScreenState.Home) {
-    return <MyStatistic />
+    return <UserHome />
   }
 
   if (screen === ScreenState.Settings) {

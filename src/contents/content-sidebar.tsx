@@ -1,9 +1,8 @@
 import React from "react"
 import { createRoot } from "react-dom/client"
 
-// Import your React component
-import { Main } from "~components/screens/main"
-import { OverlayLayer } from "~components/sections/OverlayLayer"
+import { OverlayContainer } from "~components/containers/OverlayContainer"
+import { AppMain } from "~components/screens/Main"
 import { AppProvider } from "~Context/AppContext"
 
 const sidebarId = "my-extension-sidebar"
@@ -11,7 +10,10 @@ const warpcastURL = "https://warpcast.com"
 
 // Check if the sidebar is already present
 if (!document.getElementById(sidebarId) && document.URL.includes(warpcastURL)) {
-  console.log("rendering content script")
+  console.log(
+    "[DEBUG - content-sidebar.tsx] Rendering content-sidebar script..."
+  )
+
   // Create a new div that will host your React component
   const appDiv = document.createElement("div")
   const body = document.querySelector("body")
@@ -25,9 +27,9 @@ if (!document.getElementById(sidebarId) && document.URL.includes(warpcastURL)) {
 
   root.render(
     <AppProvider>
-      <OverlayLayer>
-        <Main />
-      </OverlayLayer>
+      <OverlayContainer>
+        <AppMain />
+      </OverlayContainer>
     </AppProvider>
   )
 } else {

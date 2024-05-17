@@ -1,6 +1,7 @@
 import styled from "styled-components"
 
 import { iconsFoAnalytics } from "~components/elements/Icons"
+import type { UserAnalyticsProps } from "~types"
 
 // TODO: Add as a param an array of values for the stat
 export const UserAnalytics: React.FC<UserAnalyticsProps> = ({ prop }) => {
@@ -90,11 +91,6 @@ const Title = styled.span`
   font-size: 14px;
   font-weight: 500;
   color: ${(props) => props.color || "white"};
-`
-
-const TitleIcon = styled.img`
-  width: 17px;
-  height: 17px;
 `
 
 const Value = styled.span`

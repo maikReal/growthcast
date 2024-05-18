@@ -1,6 +1,6 @@
 import type { IconsMapperInterface } from "~types"
 
-import "./styles.css"
+import "../../styles/styles.module.css"
 
 export const iconsFoAnalytics = (iconType: string) => {
   const iconsMapper: IconsMapperInterface = {

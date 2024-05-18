@@ -1,5 +1,3 @@
-import { type ErrorRes } from "@neynar/nodejs-sdk/build/neynar-api/v2"
-import { AxiosError } from "axios"
 import {
   createContext,
   useCallback,
@@ -9,7 +7,6 @@ import {
   useState,
   type FC
 } from "react"
-import { toast } from "react-toastify"
 
 import { useStorage } from "@plasmohq/storage/hook"
 
@@ -67,15 +64,7 @@ export const AppProvider: FC<Props> = ({ children }) => {
         }
         setLoading(false)
       } catch (err) {
-        const axiosError = err as AxiosError<ErrorRes>
-        console.log(axiosError.response?.data.message)
-        toast(axiosError.response?.data.message || "An error occurred", {
-          type: "error",
-          theme: "dark",
-          autoClose: 3000,
-          position: "bottom-right",
-          pauseOnHover: true
-        })
+        console.log(err)
       }
     }
   }, [user])

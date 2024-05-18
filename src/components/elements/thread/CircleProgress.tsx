@@ -1,6 +1,6 @@
 import React from "react"
 
-import "../styles.css"
+import "../../../styles/styles.module.css"
 
 interface CircleProgressProps {
   value: number // current value

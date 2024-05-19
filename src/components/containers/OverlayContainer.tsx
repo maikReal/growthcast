@@ -3,15 +3,17 @@ import styled from "styled-components"
 
 import { CustomFloatButton } from "~components/elements/FloatButton"
 import { CloseIcon, OpenButtonArros } from "~components/elements/Icons"
+import { useApp } from "~Context/AppContext"
 
-export const OverlayLayer = ({ children }) => {
+export const OverlayContainer = ({ children }) => {
   const [isHide, setHide] = useState(true)
+  const { setScreen, isBackendLoggedIn } = useApp()
 
   const handleHidingOverlay = () => {
     setHide(!isHide)
   }
 
-  return (
+  return isBackendLoggedIn ? (
     <>
       {isHide ? (
         <OpenButton onClick={handleHidingOverlay} id="openButton">
@@ -26,12 +28,16 @@ export const OverlayLayer = ({ children }) => {
       {isHide ? (
         ""
       ) : (
-        <Container id="appDiv">
-          {children}
-          <CustomFloatButton />
-        </Container>
+        <>
+          <Container id="appDiv">
+            {children}
+            <CustomFloatButton handleSetScreen={setScreen} />
+          </Container>
+        </>
       )}
     </>
+  ) : (
+    <></>
   )
 }
 const OpenButton = styled.button`

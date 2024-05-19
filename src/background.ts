@@ -1,9 +1,9 @@
 import { Storage } from "@plasmohq/storage"
 
+import { castThread, getChannels, getUserAnalytics } from "~utils/proxy"
+
 export {}
-console.log(
-  "You may find that having is not so pleasing a thing as wanting. This is not logical, but it is often true."
-)
+console.log("[DEBUG - background.ts] The background script is working!")
 
 const storage = new Storage()
 
@@ -16,19 +16,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 // Check when a localStorage will change after the authorization to get all necessary data
 chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   if (message.type === "LOCAL_STORAGE_CHANGED") {
-    // Here you can handle the change, e.g., update extension's own storage or notify other parts of the extension
     console.log(
-      `[DEBUG] Received user data in background.ts: ${JSON.parse(message.newValue)}`
+      `[DEBUG - background.ts] Received user data after the login:`,
+      JSON.parse(message.newValue)
     )
 
-    // Add data to localStorage of an extension
     await storage.set("user-data", JSON.parse(message.newValue))
   }
 })
 
 // A listener to track when a user opens a Warpcast website to share user data with a localStorage of this domain
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  // Check for a complete status and a URL match
   if (
     changeInfo.status === "complete" &&
     tab.url &&
@@ -37,7 +35,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     const userData = await storage.get("user-data")
 
     console.log(
-      `[DEBUG] Warpcast website is loaded, sending message to content script to sahre data with a localStorage: `,
+      `[DEBUG - background.ts] Warpcast website is opened, adding user-data with a website localStorage: `,
       userData
     )
 
@@ -52,7 +50,6 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 // A listener to open a sidebar window of WarpDrive tool over a current warpcast window
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "openSidebar") {
-    // Assuming 'content-sidebar.tsx' is the content script that injects your React component
     chrome.scripting.executeScript(
       {
         target: { tabId: sender.tab.id },
@@ -62,7 +59,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (chrome.runtime.lastError) {
           sendResponse({ success: false })
           console.error(
-            "[DEBUG] Error injecting script: ",
+            "[DEBUG - background.ts] Error injecting content-sidebar script for WarpDrive opening: ",
             chrome.runtime.lastError
           )
         } else {
@@ -71,6 +68,63 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
     )
   }
-  // Return true to indicate you wish to send a response asynchronously
+  return true
+})
+
+// The listenere that is responsible for making request to the backend service
+chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+  if (request.action === "castThread") {
+    await castThread(request.metadata.threadData, request.token)
+      .then((data) => {
+        console.log(
+          `[DEBUG - background.ts] The request ${request.action} is successfully executed: `,
+          data
+        )
+        sendResponse({ data })
+      })
+      .catch((error) => {
+        console.error(
+          `[DEBUG - background.ts] Error during the execution of the ${request.action} request: `,
+          error
+        )
+        sendResponse({ error })
+      })
+  }
+
+  if (request.action === "fetchChannels") {
+    await getChannels(request.metadata.fid, request.token)
+      .then((data) => {
+        console.log(
+          `[DEBUG - background.ts] The request ${request.action} is successfully executed: `,
+          data
+        )
+        sendResponse({ data })
+      })
+      .catch((error) => {
+        console.error(
+          `[DEBUG - background.ts] Error during the execution of the ${request.action} request: `,
+          error
+        )
+        sendResponse({ error })
+      })
+  }
+
+  if (request.action === "fetchAnalytics") {
+    await getUserAnalytics(request.metadata.fid, request.token)
+      .then((data) => {
+        console.log(
+          `[DEBUG - background.ts] The request ${request.action} is successfully executed: `,
+          data
+        )
+        sendResponse({ data })
+      })
+      .catch((error) => {
+        console.error(
+          `[DEBUG - background.ts] Error during the execution of the ${request.action} request: `,
+          error
+        )
+        sendResponse({ error })
+      })
+  }
   return true
 })

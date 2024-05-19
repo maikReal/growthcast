@@ -1,10 +1,10 @@
-import { Main } from "~components/screens/main"
+import { AppMain } from "~components/screens/Main"
 import { AppProvider } from "~Context/AppContext"
 
 function IndexPage() {
   return (
     <AppProvider>
-      <Main />
+      <AppMain />
     </AppProvider>
   )
 }

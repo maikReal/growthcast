@@ -1,41 +1,58 @@
-import crypto from "crypto"
+import jwt from "jsonwebtoken"
 import { v4 as uuidv4 } from "uuid"
 
-import type { ThreadContent } from "~components/elements/thread/ThreadContent"
 import type { InputState } from "~types"
 
-const algorithm = "aes-256-cbc"
-
-// TODO: Use .env here
-const secretKey = process.env.PLASMO_PUBLIC_ENCRYPTION_KEY // Ensure this is 32 bytes
-const iv = process.env.PLASMO_PUBLIC_ENCRYPTION_IV
-
-if (!secretKey || !iv) {
+if (!process.env.PLASMO_PUBLIC_ENCRYPTION_KEY) {
   throw new Error(
-    "ENCRYPTION_KEY or/and ENCRYPTION_IV is not defined in .env or .env.development"
+    "PLASMO_PUBLIC_ENCRYPTION_KEY is not defined in .env or .env.development"
   )
 }
 
-export const contentEncrypter = (content: string) => {
-  const cipher = crypto.createCipheriv(
-    algorithm,
-    Buffer.from(secretKey, "hex"),
-    Buffer.from(iv, "hex")
-  )
-  let encrypted = cipher.update(content)
-  encrypted = Buffer.concat([encrypted, cipher.final()])
-  return encrypted.toString("hex")
+export interface SignalMetadataProps {
+  action: string
+  metadata?: {
+    [key: string | number]: Object
+  }
 }
 
-export const contentDecryptor = (hash: string) => {
-  const decipher = crypto.createDecipheriv(
-    algorithm,
-    Buffer.from(secretKey, "hex"),
-    Buffer.from(iv, "hex")
-  )
-  let decrypted = decipher.update(Buffer.from(hash, "hex"))
-  decrypted = Buffer.concat([decrypted, decipher.final()])
-  return decrypted.toString()
+export const sendRequestSignal = async (
+  requestData: SignalMetadataProps
+): Promise<any> => {
+  console.log({ requestData })
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage(
+      {
+        ...requestData,
+        ...{ token: sessionStorage.getItem("token") }
+      },
+      (response) => {
+        if (response.error) {
+          reject(response.error)
+          console.error(
+            `[DEBUG - utils/helpers.ts] Error during an execution of a ${requestData.action} method: `,
+            response.error
+          )
+        } else {
+          resolve(response.data)
+          console.log(
+            `[DEBUG - utils/helpers.ts] The method ${requestData.action} was succesfully executed:`
+          )
+        }
+      }
+    )
+  })
+}
+
+export const generateToken = () => {
+  try {
+    return jwt.sign({}, process.env.PLASMO_PUBLIC_ENCRYPTION_KEY, {
+      expiresIn: "1h"
+    })
+  } catch (error) {
+    console.error("[DEBUG - utils/helpers.ts] Error generating JWT:", error)
+    return null
+  }
 }
 
 export const prepareInputsForThreadCast = (inputs: InputState[]) => {

@@ -1,4 +1,6 @@
-import "./styles.css"
+import type { IconsMapperInterface } from "~types"
+
+import "../../styles/styles.module.css"
 
 export const iconsFoAnalytics = (iconType: string) => {
   const iconsMapper: IconsMapperInterface = {
@@ -225,14 +227,14 @@ export const CloseIcon = () => {
       xmlns="http://www.w3.org/2000/svg">
       <path
         d="M1 16L16 1"
-        stroke="black"
+        stroke="white"
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
       />
       <path
         d="M1 1L16 16"
-        stroke="black"
+        stroke="white"
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
@@ -254,6 +256,25 @@ export const OpenButtonArros = () => {
         stroke-linejoin="round"
         stroke-width="2"
         d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
+    </svg>
+  )
+}
+
+export const BackArrow = () => {
+  return (
+    <svg
+      width="22"
+      height="19"
+      viewBox="0 0 22 19"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M1 9.33333H21M1 9.33333L9.33333 1M1 9.33333L9.33333 17.6667"
+        stroke="white"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
     </svg>
   )
 }

@@ -1,9 +1,9 @@
 import styled from "styled-components"
 
+import { BasicContainer } from "~components/containers/BasicContainer"
 import { Description } from "~components/elements/DescriptionComponent"
 import { PrimaryButton } from "~components/elements/PrimaryButton"
 import { Title } from "~components/elements/TitleComponent"
-import { BasicLayer } from "~components/sections/BasicLayer"
 import { ScreenState, useApp } from "~Context/AppContext"
 
 export const SuccessScreen = ({ title, description }) => {
@@ -13,7 +13,7 @@ export const SuccessScreen = ({ title, description }) => {
   }
 
   return (
-    <BasicLayer>
+    <BasicContainer>
       <Container>
         <Title>{title}</Title>
         <Description>{description}</Description>
@@ -21,7 +21,7 @@ export const SuccessScreen = ({ title, description }) => {
           <PrimaryButton handleClick={handleBackHome}>Back home</PrimaryButton>
         </ButtonContainer>
       </Container>
-    </BasicLayer>
+    </BasicContainer>
   )
 }
 

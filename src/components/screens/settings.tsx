@@ -1,14 +1,24 @@
 import { useStorage } from "@plasmohq/storage/hook"
 
-import { ScreenState, useApp } from "~Context/AppContext"
+import { useApp } from "~Context/AppContext"
+import type { UserInfo } from "~types"
+import { userAnalyticsCleaner } from "~utils/analyticsImporter"
 
 export function Settings() {
-  const { pfp, displayName, fid, signerUuid } = useApp()
+  const { pfp, displayName, fid, setIsBackendLoggedIn, isBackendLoggedIn } =
+    useApp()
   const [_, _1, removeUser] = useStorage<UserInfo>("user-data")
 
   const handleSignout = () => {
     try {
+      // Drop a user frontend state
       removeUser.remove()
+
+      // Remove JWT tokens and logout a user from backend
+      setIsBackendLoggedIn(!isBackendLoggedIn)
+      userAnalyticsCleaner()
+
+      // Reload a user's page
       window.location.reload()
     } catch (error) {
       console.log("Issue during removing a user from 3d parry service: ", error)

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import styled from "styled-components"
 
 import type { ChannelSelect } from "~types"
-import { getChannels } from "~utils/proxy"
+import { sendRequestSignal } from "~utils/helpers"
 
 import { PrimaryButton } from "../PrimaryButton"
 
@@ -13,7 +13,14 @@ export const ThreadHeader = ({ handleCastThread, fid, setSelectedChannel }) => {
 
   useEffect(() => {
     const updateWarpcastChannels = async () => {
-      const apiChannels = await getChannels(fid)
+      // Make a request, so the background service can make a request
+      // to the backend service and get the list of channels for a user
+      const apiChannels = await sendRequestSignal({
+        action: "fetchChannels",
+        metadata: {
+          fid: fid
+        }
+      })
 
       setChannels(
         apiChannels.map((channel) => {
@@ -36,14 +43,14 @@ export const ThreadHeader = ({ handleCastThread, fid, setSelectedChannel }) => {
       if (!lastFetchTime || now - parseInt(lastFetchTime) > apiRequestTimeout) {
         updateWarpcastChannels()
       } else {
-        setChannels(
-          JSON.parse(localStorage.getItem("channels")).map((channel) => {
-            return {
-              label: channel.channelName,
-              value: channel.channelId
-            }
-          })
-        )
+        const storedChannels = JSON.parse(localStorage.getItem("channels"))
+        if (storedChannels) {
+          const formattedChannels = storedChannels.map((channel) => ({
+            label: channel.channelName,
+            value: channel.channelId
+          }))
+          setChannels(formattedChannels)
+        }
       }
     }
   }, [])
@@ -62,7 +69,7 @@ export const ThreadHeader = ({ handleCastThread, fid, setSelectedChannel }) => {
   }
 
   const handleSelect = (value) => {
-    console.log("Selected value is: ", value)
+    console.log("[DEBUG - ThreadHeader.tsx] Selected channel is: ", value)
     setSelectedChannel(value)
   }
 

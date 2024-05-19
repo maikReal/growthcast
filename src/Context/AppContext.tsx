@@ -1,5 +1,3 @@
-import { type ErrorRes } from "@neynar/nodejs-sdk/build/neynar-api/v2"
-import { AxiosError } from "axios"
 import {
   createContext,
   useCallback,
@@ -9,19 +7,22 @@ import {
   useState,
   type FC
 } from "react"
-import { toast } from "react-toastify"
 
 import { useStorage } from "@plasmohq/storage/hook"
 
 import type { AppContextInterface, Props, UserInfo, UserStat } from "~types"
-import { getUserAnalytics } from "~utils/proxy"
+import { userAnalyticsHandler } from "~utils/analyticsImporter"
+import AuthService from "~utils/authService"
 
+// [...] - is responsible for the type of a screen in the app.
+// This type is used in the code to understand where we need to show a specific screen
 export enum ScreenState {
-  Signin = "signin",
-  Home = "home",
-  Settings = "settings",
-  Thread = "thread",
-  ThreadSentSuccess = "threadSent"
+  Signin = "[login_screen]-signin",
+  Home = "[main_screen]-home",
+  Settings = "[main_screen]-settings",
+  Thread = "[feature_screen]-thread",
+  SecretMessages = "[feature_screen]-secretMessages",
+  ThreadSentSuccess = "[secondary_screen]-threadSent"
 }
 
 const AppContext = createContext<AppContextInterface | null>(null)
@@ -33,6 +34,7 @@ export const AppProvider: FC<Props> = ({ children }) => {
   const [signerUuid, setSignerUuid] = useState<string | null>(null)
   const [fid, setFid] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isBackendLoggedIn, setIsBackendLoggedIn] = useState(false)
 
   const [userAnalytics, setUserAnalytics] = useState<UserStat | null>(null)
 
@@ -53,17 +55,16 @@ export const AppProvider: FC<Props> = ({ children }) => {
       try {
         setFid(user.fid.toString())
         setSignerUuid(user.signerUuid.toString())
+        try {
+          console.log("Trying to login...")
+          await AuthService.login(user.signerUuid.toString())
+          setIsBackendLoggedIn(true)
+        } catch (err) {
+          console.error(err)
+        }
         setLoading(false)
       } catch (err) {
-        const axiosError = err as AxiosError<ErrorRes>
-        console.log(axiosError.response?.data.message)
-        toast(axiosError.response?.data.message || "An error occurred", {
-          type: "error",
-          theme: "dark",
-          autoClose: 3000,
-          position: "bottom-right",
-          pauseOnHover: true
-        })
+        console.log(err)
       }
     }
   }, [user])
@@ -73,14 +74,23 @@ export const AppProvider: FC<Props> = ({ children }) => {
 
     // Setup a timeout here to not make a requests to API every time
     const handleUserAnalytics = async () => {
-      const userData = await getUserAnalytics(user.fid)
-      setUserAnalytics(userData)
+      // TODO: Add later to manual analytics update.
+      // User clicks on a button and we make a request to update data
+      await userAnalyticsHandler({
+        fid: user.fid,
+        analyticsHandler: setUserAnalytics
+      })
     }
 
-    if (user) {
+    if (user && isBackendLoggedIn) {
+      console.log(
+        "[DEBUG - AppContext.tsx] Trying to fetch anayltics: ",
+        user,
+        userAnalytics
+      )
       handleUserAnalytics()
     }
-  }, [lookupUser])
+  }, [lookupUser, isBackendLoggedIn])
 
   const isUserLoggedIn = useCallback(async () => {
     if (user) {
@@ -108,9 +118,19 @@ export const AppProvider: FC<Props> = ({ children }) => {
       setFid,
       userAnalytics,
       setUserAnalytics,
-      loading
+      loading,
+      setIsBackendLoggedIn,
+      isBackendLoggedIn
     }),
-    [screen, displayName, pfp, signerUuid, fid, userAnalytics]
+    [
+      screen,
+      displayName,
+      pfp,
+      signerUuid,
+      fid,
+      userAnalytics,
+      isBackendLoggedIn
+    ]
   )
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>

@@ -11,21 +11,24 @@
     "dev:next": "next dev --port 1947",
     "build": "run-p build:*",
     "build:plasmo": "plasmo build",
-    "build:next": "next build"
+    "build:next": "next build",
+    "package": "plasmo package"
   },
   "dependencies": {
-    "@ant-design/icons": "^5.3.6",
+    "@ant-design/icons": "^5.3.7",
     "@headlessui/react": "^1.7.19",
-    "@neynar/nodejs-sdk": "^1.16.1",
-    "antd": "^5.16.4",
+    "@neynar/nodejs-sdk": "^1.24.0",
+    "@types/jsonwebtoken": "^9.0.6",
+    "antd": "^5.17.2",
     "axios": "^1.6.8",
+    "jsonwebtoken": "^9.0.2",
     "next": "14.1.0",
     "node-fetch": "^3.3.2",
     "plasmo": "0.85.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-toastify": "^10.0.5",
-    "styled-components": "^6.1.8",
+    "styled-components": "^6.1.11",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
@@ -40,14 +43,15 @@
     "https-browserify": "^1.0.0",
     "prettier": "3.2.4",
     "stream-browserify": "^3.0.0",
-    "stream-http": "^3.1.0",
+    "stream-http": "^3.2.0",
     "typescript": "5.3.3",
-    "url": "^0.11.0",
-    "util": "^0.12.3"
+    "url": "^0.11.3",
+    "util": "^0.12.5"
   },
   "manifest": {
     "host_permissions": [
-      "https://*/*"
+      "https://*/*",
+      "http://*/"
     ],
     "permissions": [
       "tabs",
@@ -55,12 +59,16 @@
       "activeTab",
       "windows",
       "scripting",
-      "http://localhost:3000/*"
+      "background",
+      "identity",
+      "http://localhost:3000/*",
+      "https://warp-drive-proxy.vercel.app"
     ],
     "content_scripts": [
       {
         "matches": [
-          "http://localhost:3000/*"
+          "http://localhost:3000/*",
+          "https://warp-drive-proxy.vercel.app/*"
         ],
         "js": [
           "../src/contents/content.ts"
@@ -74,6 +82,9 @@
           "../src/contents/content-sidebar.tsx"
         ]
       }
-    ]
+    ],
+    "background": {
+      "service_worker": "../src/background.ts"
+    }
   }
 }

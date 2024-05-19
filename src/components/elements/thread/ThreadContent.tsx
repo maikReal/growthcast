@@ -40,7 +40,6 @@ export const ThreadContent = ({
   return (
     <>
       {inputs.map((input, index) => {
-        console.log("index:", index, input.minimized)
         return (
           <>
             <div

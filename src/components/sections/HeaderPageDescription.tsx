@@ -1,4 +1,4 @@
-import DownOutlined from "@ant-design/icons"
+import DownOutlined from "@ant-design/icons/DownOutlined"
 import type { MenuProps } from "antd"
 import { Dropdown, Space } from "antd"
 import React from "react"

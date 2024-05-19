@@ -68,7 +68,7 @@
       {
         "matches": [
           "http://localhost:3000/*",
-          "https://warp-drive-proxy.vercel.app"
+          "https://warp-drive-proxy.vercel.app/*"
         ],
         "js": [
           "../src/contents/content.ts"

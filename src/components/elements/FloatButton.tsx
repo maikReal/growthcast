@@ -1,6 +1,8 @@
 import { ConfigProvider, FloatButton } from "antd"
 import React from "react"
 
+import { ScreenState } from "~Context/AppContext"
+
 import { OpenedFloatButton } from "./FloatButtonOpened"
 import { CloseIcon, RocketIcon } from "./Icons"
 
@@ -22,12 +24,12 @@ export const CustomFloatButton = ({ handleSetScreen }) => (
         <OpenedFloatButton
           handleClick={handleSetScreen}
           content={"Secret"}
-          type={"secret"}
+          type={ScreenState.SecretMessages}
         />
         <OpenedFloatButton
           handleClick={handleSetScreen}
           content={"Threads"}
-          type={"thread"}
+          type={ScreenState.Thread}
         />
       </FloatButton.Group>
     </ConfigProvider>

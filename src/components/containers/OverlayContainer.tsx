@@ -3,7 +3,7 @@ import styled from "styled-components"
 
 import { CustomFloatButton } from "~components/elements/FloatButton"
 import { CloseIcon, OpenButtonArros } from "~components/elements/Icons"
-import { useApp } from "~Context/AppContext"
+import { ScreenState, useApp } from "~Context/AppContext"
 
 export const OverlayContainer = ({ children }) => {
   const [isHide, setHide] = useState(true)
@@ -11,6 +11,7 @@ export const OverlayContainer = ({ children }) => {
 
   const handleHidingOverlay = () => {
     setHide(!isHide)
+    setScreen(ScreenState.Home)
   }
 
   return isBackendLoggedIn ? (

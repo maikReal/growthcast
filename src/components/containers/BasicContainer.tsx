@@ -9,11 +9,12 @@ export const BasicContainer = ({ children }: Props) => {
 const Layer = styled.div`
   display: flex;
   flex-direction: column;
-  width: 400px;
+  width: 450px;
   height: 100%;
   padding: 55px 45px;
   align-items: center;
   justify-content: flex-start;
   text-align: center;
   row-gap: 50px;
+  overflow-y: scroll;
 `

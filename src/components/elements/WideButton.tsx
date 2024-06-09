@@ -16,7 +16,6 @@ const Container = styled.div`
   width: 100%;
   background-color: #1e1826;
   color: #ffffff;
-  height: 65px;
   display: flex;
   justify-content: space-between;
   border-radius: 10px;

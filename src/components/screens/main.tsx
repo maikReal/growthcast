@@ -13,7 +13,7 @@ export function AppMain() {
 
   if (screen === ScreenState.Signin) {
     return <Signin />
-  }
+  } 
 
   if (screen === ScreenState.Home) {
     return <UserHome />

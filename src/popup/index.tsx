@@ -1,11 +1,13 @@
 import { AppMain } from "~components/screens/Main"
+import { PopupScreens } from "~components/screens/popupStates"
 import { AppProvider } from "~Context/AppContext"
 
 function IndexPopup() {
-  console.log(process.env.PLASMO_PUBLIC_ENCRYPTION_KEY)
   return (
     <AppProvider>
-      <AppMain />
+      {/* TODO: Test it out */}
+      {/* <AppMain /> */}
+      <PopupScreens />
     </AppProvider>
   )
 }

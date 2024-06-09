@@ -34,10 +34,6 @@ export function Settings() {
         <HeaderPageDescription
           content={`You've signed in as ${displayName} (fid: ${fid})`}
         />
-        {/* <span>
-          Your name: {displayName} (fid: {fid})
-        </span> */}
-        {/* <button onClick={handleSignout}>SignOut</button> */}
         <WideButton
           isExternal={true}
           btnText={"Sign out form account"}
@@ -45,32 +41,5 @@ export function Settings() {
         />
       </BasicContainer>
     </>
-
-    // <div
-    //   style={{
-    //     display: "flex",
-    //     flexDirection: "column",
-    //     padding: 16,
-    //     width: "400px",
-    //     height: "1000px"
-    //   }}>
-    //   <h1>Home page</h1>
-    //   <div
-    //     style={{
-    //       display: "flex"
-    //     }}>
-    //     <img
-    //       src={pfp}
-    //       style={{
-    //         width: "24px",
-    //         height: "24px"
-    //       }}
-    //     />
-    //     <span>
-    //       Your name: {displayName} (fid: {fid})
-    //     </span>
-    //     <button onClick={handleSignout}>SignOut</button>
-    //   </div>
-    // </div>
   )
 }

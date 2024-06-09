@@ -17,7 +17,7 @@ export const UserHome = () => {
           <BasicContainer>
             <HeaderPageDescription
               content={
-                "All statistics by default is for last 7 days and relates to your profile"
+                "All statistics by default is for the whole account life and relates to your profile"
               }
             />
             <UserAnalytics prop={userAnalytics} />

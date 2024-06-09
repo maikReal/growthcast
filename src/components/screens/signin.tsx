@@ -1,4 +1,11 @@
 import { useCallback } from "react"
+import styled from "styled-components"
+
+import { BasicContainer } from "~components/containers/BasicContainer"
+import { Description } from "~components/elements/DescriptionComponent"
+import { Title } from "~components/elements/TitleComponent"
+import { WideButton } from "~components/elements/WideButton"
+import { HeaderPageDescription } from "~components/sections/HeaderPageDescription"
 
 export function Signin() {
   const getSignInBtn = useCallback(() => {
@@ -7,24 +14,30 @@ export function Signin() {
     }
 
     return (
-      <div>
-        <button onClick={handleSignIn}>SingIn</button>
-      </div>
+      <WideButton
+        isExternal={true}
+        btnText={"Login to Warpcast"}
+        actionHandler={handleSignIn}
+      />
     )
   }, [])
 
-  // TODO: Make a desing for the login page
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        padding: 16,
-        width: "200px"
-      }}>
-      <h1></h1>
-
+    <BasicContainer>
+      <Container>
+        <Title>Login to Warpcast</Title>
+        <Description>
+          To use Warpdrive you need to login to your Warpcast account first. Use
+          the button below
+        </Description>
+      </Container>
       {getSignInBtn()}
-    </div>
+    </BasicContainer>
   )
 }
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+`

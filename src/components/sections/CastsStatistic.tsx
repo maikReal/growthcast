@@ -20,17 +20,20 @@ const columns: TableProps<DataType>["columns"] = [
   {
     title: "Likes",
     dataIndex: "likes",
-    key: "likes"
+    key: "likes",
+    sorter: (a, b) => a.likes - b.likes
   },
   {
     title: "Replies",
     dataIndex: "replies",
-    key: "replies"
+    key: "replies",
+    sorter: (a, b) => a.replies - b.replies
   },
   {
     title: "Recasts",
     dataIndex: "recasts",
-    key: "recasts"
+    key: "recasts",
+    sorter: (a, b) => a.recasts - b.recasts
   }
 ]
 
@@ -47,6 +50,12 @@ const CastsStatistic = ({ casts }) => {
           Table: {
             headerSplitColor: "transparent",
             borderColor: "#9A9FA9"
+          },
+          Pagination: {
+            colorText: "#FFFFFF",
+            itemActiveBg: "#FFFFFF",
+            itemBg: "transparent",
+            itemLinkBg: "transparent"
           }
         },
         token: {
@@ -63,8 +72,10 @@ const CastsStatistic = ({ casts }) => {
         columns={columns}
         dataSource={castsWithkeys}
         size="small"
-        pagination={{ position: ["none", "none"] }} // TODO: Enable pagination
-        //   pagination={{ pageSize: 3 }}
+        pagination={{
+          position: ["bottomRight"],
+          pageSize: 8
+        }}
         rowHoverable={false}
       />
     </ConfigProvider>

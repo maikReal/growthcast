@@ -5,6 +5,7 @@
   "description": "A tool for analysis of Warpcast activities",
   "author": "Mike Krupin",
   "scripts": {
+    "clean": "rm -rf dist build",
     "start": "next start",
     "dev": "run-p dev:*",
     "dev:plasmo": "plasmo dev",
@@ -62,13 +63,13 @@
       "background",
       "identity",
       "http://localhost:3000/*",
-      "https://warp-drive-proxy.vercel.app"
+      "https://proxy.warp-drive.xyz/*"
     ],
     "content_scripts": [
       {
         "matches": [
           "http://localhost:3000/*",
-          "https://warp-drive-proxy.vercel.app/*"
+          "https://proxy.warp-drive.xyz/*"
         ],
         "js": [
           "../src/contents/content.ts"

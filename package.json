@@ -1,8 +1,8 @@
 {
   "name": "warp-drive",
-  "displayName": "WarpDrive",
+  "displayName": "Warpdrive",
   "version": "0.0.1",
-  "description": "A tool for analysis of Warpcast activities",
+  "description": "Farcaster app that boosts your Web3 socials",
   "author": "Mike Krupin",
   "scripts": {
     "clean": "rm -rf dist build",
@@ -57,13 +57,13 @@
     "permissions": [
       "tabs",
       "storage",
-      "activeTab",
       "windows",
       "scripting",
       "background",
       "identity",
       "http://localhost:3000/*",
-      "https://proxy.warp-drive.xyz/*"
+      "https://proxy.warp-drive.xyz/*",
+      "https://warpcast.com/*"
     ],
     "content_scripts": [
       {

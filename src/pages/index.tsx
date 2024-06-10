@@ -1,12 +1,10 @@
-import { AppMain } from "~components/screens/Main"
-import { PopupScreens } from "~components/screens/popupStates"
+import { AppMain } from "~components/screens/main"
 import { AppProvider } from "~Context/AppContext"
 
 function IndexPage() {
   return (
     <AppProvider>
       <AppMain />
-      {/* <PopupScreens /> */}
     </AppProvider>
   )
 }

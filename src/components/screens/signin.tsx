@@ -6,7 +6,6 @@ import { Description } from "~components/elements/DescriptionComponent"
 import { PrimaryButton } from "~components/elements/PrimaryButton"
 import { Title } from "~components/elements/TitleComponent"
 import { WideButton } from "~components/elements/WideButton"
-import { HeaderPageDescription } from "~components/sections/HeaderPageDescription"
 
 export function Signin() {
   const getSignInBtn = useCallback(() => {
@@ -23,6 +22,7 @@ export function Signin() {
     )
   }, [])
 
+  // Temproray code for the testing
   const [hasBetaAccess, setHasBetaAccess] = useState(false)
   const [inputValue, setInputValue] = useState<string>("")
   const [message, setMessage] = useState<string>("")
@@ -70,12 +70,6 @@ export function Signin() {
   )
 }
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  row-gap: 10px;
-`
-
 const AccessCodeContainer = styled.div`
   width: 100%;
   display: flex;
@@ -85,6 +79,13 @@ const AccessCodeContainer = styled.div`
   row-gap: 15px;
 `
 
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+`
+
+// For beta testing
 const InputField = styled.input`
   width: 100%;
   background-color: #1e1826;

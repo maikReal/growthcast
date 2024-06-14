@@ -5,7 +5,6 @@ function IndexPage() {
   return (
     <AppProvider>
       <AppMain />
-      {/* <PopupScreens /> */}
     </AppProvider>
   )
 }

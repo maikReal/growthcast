@@ -57,7 +57,6 @@
     "permissions": [
       "tabs",
       "storage",
-      "activeTab",
       "windows",
       "scripting",
       "background",

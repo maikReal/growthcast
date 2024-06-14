@@ -2,7 +2,7 @@ import React from "react"
 import { createRoot } from "react-dom/client"
 
 import { OverlayContainer } from "~components/containers/OverlayContainer"
-import { AppMain } from "~components/screens/Main"
+import { AppMain } from "~components/screens/main"
 import { AppProvider } from "~Context/AppContext"
 
 const sidebarId = "my-extension-sidebar"

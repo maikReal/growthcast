@@ -16,6 +16,7 @@ const Button = styled.div`
 
   &:hover {
     background-color: rgb(187, 150, 249, 0.8);
+    transition: ease-out 0.3s;
     color: rgb(249, 249, 249, 0.8);
   }
 `

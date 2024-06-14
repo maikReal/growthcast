@@ -10,6 +10,7 @@ import {
 
 import { useStorage } from "@plasmohq/storage/hook"
 
+import { StatPeriods } from "~components/screens/home"
 import type { AppContextInterface, Props, UserInfo, UserStat } from "~types"
 import { userAnalyticsHandler } from "~utils/analyticsImporter"
 import AuthService from "~utils/authService"
@@ -25,6 +26,19 @@ export enum ScreenState {
   ThreadSentSuccess = "[secondary_screen]-threadSent"
 }
 
+export interface StatisticForPeriod {
+  currentCasts: UserStat[]
+  currentTotalCasts: number
+  currentTotalLikes: number
+  currentTotalRecasts: number
+  currentTotalReplies: number
+  previousCasts: UserStat[]
+  previousTotalCasts: number
+  previousTotalLikes: number
+  previousTotalRecasts: number
+  previousTotalReplies: number
+}
+
 const AppContext = createContext<AppContextInterface | null>(null)
 
 export const AppProvider: FC<Props> = ({ children }) => {
@@ -37,6 +51,12 @@ export const AppProvider: FC<Props> = ({ children }) => {
   const [isBackendLoggedIn, setIsBackendLoggedIn] = useState(false)
 
   const [userAnalytics, setUserAnalytics] = useState<UserStat | null>(null)
+  const [userAnalytic7Days, setUserAnalytics7Days] =
+    useState<StatisticForPeriod | null>(null)
+  const [userAnalytics14Days, setUserAnalytics14Days] =
+    useState<StatisticForPeriod | null>(null)
+  const [userAnalytics30Days, setUserAnalytics30Days] =
+    useState<StatisticForPeriod | null>(null)
 
   const [user, setUser, removeUser] = useStorage<UserInfo | null>(
     "user-data",
@@ -76,10 +96,40 @@ export const AppProvider: FC<Props> = ({ children }) => {
     const handleUserAnalytics = async () => {
       // TODO: Add later to manual analytics update.
       // User clicks on a button and we make a request to update data
+
+      // Get casts analytics per user for all his time
+      // Analytics for the whole time
       await userAnalyticsHandler({
         fid: user.fid,
         analyticsHandler: setUserAnalytics
       })
+
+      // Get casts analytics per user for last 7 days
+      await userAnalyticsHandler(
+        {
+          fid: user.fid,
+          analyticsHandler: setUserAnalytics7Days
+        },
+        StatPeriods.compareWith7Days
+      )
+
+      // Get casts analytics per user for last 30 days
+      await userAnalyticsHandler(
+        {
+          fid: user.fid,
+          analyticsHandler: setUserAnalytics14Days
+        },
+        StatPeriods.compareWith14Days
+      )
+
+      // Get casts analytics per user for last 90 days
+      await userAnalyticsHandler(
+        {
+          fid: user.fid,
+          analyticsHandler: setUserAnalytics30Days
+        },
+        StatPeriods.compareWith30Days
+      )
     }
 
     if (user && isBackendLoggedIn) {
@@ -116,11 +166,17 @@ export const AppProvider: FC<Props> = ({ children }) => {
       setSignerUuid,
       fid,
       setFid,
-      userAnalytics,
-      setUserAnalytics,
       loading,
       setIsBackendLoggedIn,
-      isBackendLoggedIn
+      isBackendLoggedIn,
+      userAnalytics,
+      setUserAnalytics,
+      userAnalytic7Days,
+      setUserAnalytics7Days,
+      userAnalytics14Days,
+      setUserAnalytics14Days,
+      userAnalytics30Days,
+      setUserAnalytics30Days
     }),
     [
       screen,
@@ -128,8 +184,11 @@ export const AppProvider: FC<Props> = ({ children }) => {
       pfp,
       signerUuid,
       fid,
+      isBackendLoggedIn,
       userAnalytics,
-      isBackendLoggedIn
+      userAnalytic7Days,
+      userAnalytics14Days,
+      userAnalytics30Days
     ]
   )
 

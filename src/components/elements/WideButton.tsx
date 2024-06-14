@@ -12,15 +12,21 @@ export const WideButton = ({ isExternal, btnText, actionHandler }) => {
   )
 }
 
-const Container = styled.div`
+const Container = styled.button`
   width: 100%;
   background-color: #1e1826;
   color: #ffffff;
   display: flex;
   justify-content: space-between;
   border-radius: 10px;
-  align-content: center;
+  align-items: center;
   padding: 22.5px 16px;
+  border-style: none;
+
+  &: hover {
+    background-color: #7866bb;
+    transition: ease-out 0.3s;
+  }
 `
 
 const ButtonText = styled.span`

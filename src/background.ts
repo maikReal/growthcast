@@ -1,6 +1,11 @@
 import { Storage } from "@plasmohq/storage"
 
-import { castThread, getChannels, getUserAnalytics } from "~utils/proxy"
+import {
+  castThread,
+  getCastsByPeriod,
+  getChannels,
+  getUserAnalytics
+} from "~utils/proxy"
 
 export {}
 console.log("[DEBUG - background.ts] The background script is working!")
@@ -126,5 +131,28 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
         sendResponse({ error })
       })
   }
+
+  if (request.action === "fetchCastsByPeriod") {
+    await getCastsByPeriod(
+      request.metadata.fid,
+      request.token,
+      request.metadata.period
+    )
+      .then((data) => {
+        console.log(
+          `[DEBUG - background.ts] The request ${request.action} is successfully executed: `,
+          data
+        )
+        sendResponse({ data })
+      })
+      .catch((error) => {
+        console.error(
+          `[DEBUG - background.ts] Error during the execution of the ${request.action} request: `,
+          error
+        )
+        sendResponse({ error })
+      })
+  }
+
   return true
 })

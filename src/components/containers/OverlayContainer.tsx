@@ -8,10 +8,19 @@ import { ScreenState, useApp } from "~Context/AppContext"
 export const OverlayContainer = ({ children }) => {
   const [isHide, setHide] = useState(true)
   const { setScreen, isBackendLoggedIn } = useApp()
+  const [isCloseBtnHovered, setIsCloseBtnHovered] = useState(false)
 
   const handleHidingOverlay = () => {
     setHide(!isHide)
     setScreen(ScreenState.Home)
+  }
+
+  const hoverCloseBtn = () => {
+    setIsCloseBtnHovered(true)
+  }
+
+  const unHoverCloseBtn = () => {
+    setIsCloseBtnHovered(false)
   }
 
   return isBackendLoggedIn ? (
@@ -22,8 +31,12 @@ export const OverlayContainer = ({ children }) => {
           WarpDrive 🚀
         </OpenButton>
       ) : (
-        <CloseButton onClick={handleHidingOverlay} id="closeButton">
-          <CloseIcon />
+        <CloseButton
+          onClick={handleHidingOverlay}
+          onMouseEnter={hoverCloseBtn}
+          onMouseLeave={unHoverCloseBtn}
+          id="closeButton">
+          <CloseIcon isCloseBtnHovered={isCloseBtnHovered} />
         </CloseButton>
       )}
       {isHide ? (
@@ -75,4 +88,5 @@ const Container = styled.div`
   display: flex;
   height: 100%;
   z-index: 10;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
 `

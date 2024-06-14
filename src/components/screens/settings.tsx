@@ -31,9 +31,7 @@ export function Settings() {
   return (
     <>
       <BasicContainer>
-        <HeaderPageDescription
-          content={`You've signed in as ${displayName} (fid: ${fid})`}
-        />
+        <HeaderPageDescription content={`You've signed with fid: ${fid}`} />
         <WideButton
           isExternal={true}
           btnText={"Sign out form account"}

@@ -49,13 +49,18 @@ const CastsStatistic = ({ casts }) => {
         components: {
           Table: {
             headerSplitColor: "transparent",
-            borderColor: "#9A9FA9"
+            borderColor: "rgb(231,231,231,60%)",
+            colorPrimaryHover: "#ff7875",
+            colorPrimaryActive: "#ff7875",
+            headerBg: "#777777",
+            borderRadius: 20
           },
           Pagination: {
             colorText: "#FFFFFF",
             itemActiveBg: "#FFFFFF",
             itemBg: "transparent",
-            itemLinkBg: "transparent"
+            itemLinkBg: "transparent",
+            borderRadius: 10
           }
         },
         token: {
@@ -74,6 +79,7 @@ const CastsStatistic = ({ casts }) => {
         size="small"
         pagination={{
           position: ["bottomRight"],
+          showSizeChanger: false,
           pageSize: 8
         }}
         rowHoverable={false}

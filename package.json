@@ -1,7 +1,7 @@
 {
   "name": "warp-drive",
   "displayName": "Warpdrive",
-  "version": "0.0.1",
+  "version": "2.1.0",
   "description": "Farcaster app that boosts your Web3 socials",
   "author": "Mike Krupin",
   "scripts": {
@@ -60,16 +60,16 @@
       "windows",
       "scripting",
       "background",
-      "identity",
       "http://localhost:3000/*",
       "https://proxy.warp-drive.xyz/*",
-      "https://warpcast.com/*"
+      "https://dev.warp-drive.xyz/*"
     ],
     "content_scripts": [
       {
         "matches": [
           "http://localhost:3000/*",
-          "https://proxy.warp-drive.xyz/*"
+          "https://proxy.warp-drive.xyz/*",
+          "https://dev.warp-drive.xyz/*"
         ],
         "js": [
           "../src/contents/content.ts"

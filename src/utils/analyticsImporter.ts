@@ -1,3 +1,7 @@
+import { StatPeriods } from "~components/screens/home"
+import type { StatisticForPeriod } from "~Context/AppContext"
+import type { UserStat } from "~types"
+
 import { sendRequestSignal } from "./helpers"
 
 interface AnalyticsImporterProps {
@@ -5,31 +9,51 @@ interface AnalyticsImporterProps {
   analyticsHandler: (data: any) => void
 }
 
-const localStorageAnalyticsKey = "userAnalytics"
-const localStorageFetchAnalyticsDate = "lastFetchAnalyticsDate"
+const localStorageAnalyticsKeyBase = "userAnalytics"
+const localStorageFetchAnalyticsDateBase = "lastFetchAnalyticsDate"
+const defaultPeriod = "all"
+
+const getLocalStorageKey = (period: string, base: string) => `${base}_${period}`
 
 const userAnalyticsImporter = async (
-  analyticsRequestData: AnalyticsImporterProps
+  analyticsRequestData: AnalyticsImporterProps,
+  period: string = defaultPeriod
 ) => {
   const userData = await sendRequestSignal({
-    action: "fetchAnalytics",
+    action: period == "all" ? "fetchAnalytics" : "fetchCastsByPeriod",
     metadata: {
+      period: period,
       fid: analyticsRequestData.fid
     }
   })
 
-  localStorage.setItem(localStorageAnalyticsKey, JSON.stringify(userData))
-  localStorage.setItem(localStorageFetchAnalyticsDate, new Date().toString())
+  localStorage.setItem(
+    getLocalStorageKey(period, localStorageAnalyticsKeyBase),
+    JSON.stringify(userData)
+  )
+  localStorage.setItem(
+    getLocalStorageKey(period, localStorageFetchAnalyticsDateBase),
+    new Date().toString()
+  )
 
   analyticsRequestData.analyticsHandler(userData)
 }
 
 export const userAnalyticsHandler = async (
-  analyticsRequestData: AnalyticsImporterProps
+  analyticsRequestData: AnalyticsImporterProps,
+  period: string = defaultPeriod
 ) => {
-  const storedDate = localStorage.getItem(localStorageFetchAnalyticsDate)
+  const storedDateKey = getLocalStorageKey(
+    period,
+    localStorageFetchAnalyticsDateBase
+  )
+  const storedDate = localStorage.getItem(storedDateKey)
   const currentDate = new Date()
 
+  console.log(
+    "[DEBUG - utils/analyticsImporter.ts] Chosen period for statistic: ",
+    period
+  )
   console.log(
     "[DEBUG - utils/analyticsImporter.ts] Last user analytics fetched date: ",
     storedDate
@@ -46,9 +70,14 @@ export const userAnalyticsHandler = async (
     )
     // Check if data was fetched more then 30 mins ago or not
     if (timeDifference > 30) {
-      await userAnalyticsImporter(analyticsRequestData)
+      console.log(
+        `[DEBUG - utils/analyticsImporter.ts] Trying to fetch a new user analytics for the period: ${period}`
+      )
+      await userAnalyticsImporter(analyticsRequestData, period)
     } else {
-      const storedData = localStorage.getItem(localStorageAnalyticsKey)
+      const storedData = localStorage.getItem(
+        getLocalStorageKey(period, localStorageAnalyticsKeyBase)
+      )
       if (storedData) {
         console.log(
           "[DEBUG - utils/analyticsImporter.ts] Getting analytics from a local storage..."
@@ -62,11 +91,60 @@ export const userAnalyticsHandler = async (
     console.log(
       "[DEBUG - utils/analyticsImporter.ts] Fetching analytics from a backend service..."
     )
-    await userAnalyticsImporter(analyticsRequestData)
+    await userAnalyticsImporter(analyticsRequestData, period)
   }
 }
 
-export const userAnalyticsCleaner = () => {
-  localStorage.removeItem(localStorageAnalyticsKey)
-  localStorage.removeItem(localStorageFetchAnalyticsDate)
+export const userAnalyticsCleaner = (period: string = defaultPeriod) => {
+  localStorage.removeItem(
+    getLocalStorageKey(period, localStorageAnalyticsKeyBase)
+  )
+  localStorage.removeItem(
+    getLocalStorageKey(period, localStorageFetchAnalyticsDateBase)
+  )
+}
+
+export interface PercentageDifferenceData {
+  totalCastsPercentageDifference: string
+  totalLikesPercentageDifference: string
+  totalRecastsPercentageDifference: string
+  totalRepliesPercentageDifference: string
+}
+const calculatePercentageDifference = (
+  current: number,
+  previous: number
+): string => {
+  if (previous == 0 || previous == null) {
+    return current == 0 ? "0%" : "no data"
+  }
+  const difference = (((current - previous) / previous) * 100).toFixed(0)
+  return `${difference.startsWith("-") ? difference : "+" + difference}%`
+}
+
+export const calculateStatisticDifferences = (
+  data: StatisticForPeriod
+): PercentageDifferenceData => {
+  const totalCastsPercentageDifference = calculatePercentageDifference(
+    data.currentTotalCasts,
+    data.previousTotalCasts
+  )
+  const totalLikesPercentageDifference = calculatePercentageDifference(
+    data.currentTotalLikes,
+    data.previousTotalLikes
+  )
+  const totalRecastsPercentageDifference = calculatePercentageDifference(
+    data.currentTotalRecasts,
+    data.previousTotalRecasts
+  )
+  const totalRepliesPercentageDifference = calculatePercentageDifference(
+    data.currentTotalReplies,
+    data.previousTotalReplies
+  )
+
+  return {
+    totalCastsPercentageDifference,
+    totalLikesPercentageDifference,
+    totalRecastsPercentageDifference,
+    totalRepliesPercentageDifference
+  }
 }

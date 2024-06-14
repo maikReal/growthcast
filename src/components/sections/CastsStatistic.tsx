@@ -79,6 +79,7 @@ const CastsStatistic = ({ casts }) => {
         size="small"
         pagination={{
           position: ["bottomRight"],
+          showSizeChanger: false,
           pageSize: 8
         }}
         rowHoverable={false}

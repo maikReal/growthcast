@@ -2,6 +2,50 @@ import type { Channel, ThreadData, UserStat } from "~types"
 
 import AuthService from "./authService"
 
+export const getCastsByPeriod = async (
+  fid: string,
+  token: string,
+  period: string
+) => {
+  const fetchCastsByPeriod = async () => {
+    console.log(
+      "request",
+      `${process.env.PLASMO_PUBLIC_DOMAIN}/api/db/get-stats-by-period/${fid}?period=${period}`
+    )
+    return await fetch(
+      `${process.env.PLASMO_PUBLIC_DOMAIN}/api/db/get-stats-by-period/${fid}?period=${period}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    )
+  }
+
+  let response = await fetchCastsByPeriod()
+
+  console.log("My response: ", response)
+
+  if (response.status === 403) {
+    console.log(
+      `[DEBUG - utils/proxy.ts] JWT token is expired during the request to /api/db/get-stats-by-period/${fid}?period=${period}, trying to refresh it. Previous error: `,
+      response.status,
+      response.statusText
+    )
+    await AuthService.refreshToken()
+    response = await fetchCastsByPeriod()
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `[ERROR - utils/proxy.ts] The external method /api/stat/db/get-stats-by-period/${fid}?period=${period} returned a bad HTTP status: ${response.status} -> ${response.statusText}`
+    )
+  }
+  const data: UserStat = await response.json()
+
+  return data
+}
+
 export const getUserAnalytics = async (fid: string, token: string) => {
   const fetchAnalytics = async () => {
     return await fetch(`${process.env.PLASMO_PUBLIC_DOMAIN}/api/stat/${fid}`, {
@@ -25,7 +69,7 @@ export const getUserAnalytics = async (fid: string, token: string) => {
 
   if (!response.ok) {
     throw new Error(
-      `[DEBUG - utils/proxy.ts] The external method /api/stat/${fid} returned a bad HTTP status: ${response.status} -> ${response.statusText}`
+      `[ERROR - utils/proxy.ts] The external method /api/stat/${fid} returned a bad HTTP status: ${response.status} -> ${response.statusText}`
     )
   }
   const data: UserStat = await response.json()

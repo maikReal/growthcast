@@ -98,7 +98,6 @@ const InputField = styled.input`
   font-weight: 500;
   font-family: "Poppins", sans-serif;
   text-transform: uppercase;
-
   &:focus {
     border-color: #4c2897;
   }
@@ -115,7 +114,6 @@ const TestingButton = styled.button`
   font-size: 18px;
   font-weight: 500;
   font-family: "Poppins", sans-serif;
-
   &:hover {
     background-color: #7866bb;
     transition: ease-out 0.3s;

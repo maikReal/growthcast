@@ -40,6 +40,12 @@ interface AppContextInterface {
   setFid: SetState<string | null>
   userAnalytics: UserStat | null
   setUserAnalytics: SetState<UserStat | null>
+  userAnalytic7Days: StatisticForPeriod | null
+  setUserAnalytics7Days: SetState<StatisticForPeriod | null>
+  userAnalytics14Days: StatisticForPeriod | null
+  setUserAnalytics14Days: SetState<StatisticForPeriod | null>
+  userAnalytics30Days: StatisticForPeriod | null
+  setUserAnalytics30Days: SetState<StatisticForPeriod | null>
   loading: boolean
   setIsBackendLoggedIn: SetState<boolean | null>
   isBackendLoggedIn: boolean

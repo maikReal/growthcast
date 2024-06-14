@@ -2,6 +2,8 @@ import type { IconsMapperInterface } from "~types"
 
 import "../../styles/styles.module.css"
 
+import styled from "styled-components"
+
 export const ExternalButtonIcon = () => {
   return (
     <svg
@@ -236,7 +238,11 @@ export const RocketIcon = () => {
   )
 }
 
-export const CloseIcon = () => {
+export const CloseIcon = ({
+  isCloseBtnHovered
+}: {
+  isCloseBtnHovered?: boolean
+}) => {
   return (
     <svg
       width="17"
@@ -246,14 +252,14 @@ export const CloseIcon = () => {
       xmlns="http://www.w3.org/2000/svg">
       <path
         d="M1 16L16 1"
-        stroke="white"
+        stroke={isCloseBtnHovered ? "#9A7BCD" : "white"}
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
       />
       <path
         d="M1 1L16 16"
-        stroke="white"
+        stroke={isCloseBtnHovered ? "#9A7BCD" : "white"}
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"

@@ -1,22 +1,32 @@
+import type { ReactNode } from "react"
 import styled from "styled-components"
 
-export const PrimaryButton = ({ children, handleClick }) => {
+export const PrimaryButton = ({
+  children,
+  handleClick
+}: {
+  children: ReactNode
+  handleClick: any
+}) => {
   return <Button onClick={handleClick}>{children}</Button>
 }
 
 const Button = styled.div`
-  background-color: #bb96f9;
+  background-color: #423761;
   color: #ffffff;
-  font-size: 12px;
-  border-radius: 25px;
-  padding: 9px 18px;
+  font-size: 14px;
+  border-radius: 8px;
+  padding: 5px 15px;
   font-weight: 600;
   font-family: "Poppins", sans-serif;
   border: 0px;
+  display: flex;
+  align-items: center;
+  height: 100%;
 
   &:hover {
-    background-color: rgb(187, 150, 249, 0.8);
-    transition: ease-out 0.3s;
-    color: rgb(249, 249, 249, 0.8);
+    background-color: #5d4e8d;
+    transition: ease-out 0.1s;
+    color: #ffffff;
   }
 `

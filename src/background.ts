@@ -4,6 +4,7 @@ import {
   castThread,
   getCastsByPeriod,
   getChannels,
+  getSuggestionsByFid,
   getUserAnalytics
 } from "~utils/proxy"
 
@@ -138,6 +139,24 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       request.token,
       request.metadata.period
     )
+      .then((data) => {
+        console.log(
+          `[DEBUG - background.ts] The request ${request.action} is successfully executed: `,
+          data
+        )
+        sendResponse({ data })
+      })
+      .catch((error) => {
+        console.error(
+          `[DEBUG - background.ts] Error during the execution of the ${request.action} request: `,
+          error
+        )
+        sendResponse({ error })
+      })
+  }
+
+  if (request.action === "fetchOpenrankSuggestions") {
+    await getSuggestionsByFid(request.metadata.fid, request.token)
       .then((data) => {
         console.log(
           `[DEBUG - background.ts] The request ${request.action} is successfully executed: `,

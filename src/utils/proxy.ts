@@ -1,6 +1,7 @@
 import type { Channel, ThreadData, UserStat } from "~types"
 
 import AuthService from "./authService"
+import type { UserInfoProp } from "./openrankSuggestions"
 
 export const getCastsByPeriod = async (
   fid: string,
@@ -141,6 +142,42 @@ export const getChannels = async (fid: string, token: string) => {
     )
   }
   const data: Array<Channel> = await response.json()
+
+  return data
+}
+
+// Openrank recommendations
+
+export const getSuggestionsByFid = async (fid: string, token: string) => {
+  const fetchSuggestions = async () => {
+    return await fetch(
+      `${process.env.PLASMO_PUBLIC_DOMAIN}/api/power-users/${fid}?filter=all`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    )
+  }
+
+  let response = await fetchSuggestions()
+
+  if (response.status === 403) {
+    console.log(
+      `[DEBUG - utils/proxy.ts] JWT token is expired during the request to /api/power-users/${fid}, trying to refresh it. Previous error: `,
+      response.status,
+      response.statusText
+    )
+    await AuthService.refreshToken()
+    response = await fetchSuggestions()
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `[DEBUG - utils/proxy.ts] The external method /api/power-users/${fid} returned a bad HTTP status: ${response.status} -> ${response.statusText}`
+    )
+  }
+  const data: Array<UserInfoProp> = await response.json()
 
   return data
 }

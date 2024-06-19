@@ -3,6 +3,7 @@ import styled from "styled-components"
 
 import { CustomFloatButton } from "~components/elements/FloatButton"
 import { CloseIcon, OpenButtonArros } from "~components/elements/Icons"
+import { addSuggestionsSection } from "~components/screens/suggestions"
 import { ScreenState, useApp } from "~Context/AppContext"
 
 export const OverlayContainer = ({ children }) => {
@@ -49,6 +50,7 @@ export const OverlayContainer = ({ children }) => {
           </Container>
         </>
       )}
+      {addSuggestionsSection()}
     </>
   ) : (
     <></>

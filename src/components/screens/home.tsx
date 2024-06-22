@@ -1,3 +1,4 @@
+import { Space } from "antd"
 import { useState } from "react"
 import styled from "styled-components"
 
@@ -99,11 +100,12 @@ export const UserHome = () => {
             <HeaderPageDescription
               content={
                 <>
-                  Choose a time period that you want to use for the data
-                  comparison.
-                  <CustomLink href="https://maikyman.notion.site/Tendency-feature-7e3d389bb6c941b289bff7192f2e8df0?pvs=4">
-                    Get more details
-                  </CustomLink>
+                  <Space>
+                    Select a time period for data comparison.
+                    <CustomLink href="https://maikyman.notion.site/Tendency-feature-7e3d389bb6c941b289bff7192f2e8df0?pvs=4">
+                      Get more details
+                    </CustomLink>
+                  </Space>
                 </>
               }
             />
@@ -132,7 +134,7 @@ export const UserHome = () => {
               <Title
                 fontSize="16px"
                 withTooltip={true}
-                tooltipText="There are all your casts that you can filter by different metrics">
+                tooltipText="All your casts, which can be filtered by different metrics">
                 Total casts
               </Title>
               <CastsStatistic casts={userAnalytics.currentCasts} />

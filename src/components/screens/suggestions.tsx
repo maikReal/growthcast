@@ -34,7 +34,7 @@ export const OpenrankSuggestions = () => {
           <Title
             fontSize="16px"
             withTooltip={true}
-            tooltipText="The list of buddies that is generated using OpenRank algorithms">
+            tooltipText="The buddy list generated using OpenRank algorithms">
             Find a buddy
           </Title>
           {fidSuggestions.slice(0, 5).map((user, index) => (

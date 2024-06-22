@@ -4,35 +4,41 @@ import styled from "styled-components"
 
 import { Title } from "~components/elements/TitleComponent"
 import { UserCard } from "~components/elements/UserCard"
-import { useApp } from "~Context/AppContext"
 import { getSuggestions, type UserInfoProp } from "~utils/openrankSuggestions"
 
 export const OpenrankSuggestions = () => {
-  //   const { fid } = useApp()
+  const userData = localStorage.getItem("user-data") || null
 
-  //  TODO: Fix adding a dynamic fid
-  const fid = "295767"
+  const fid = userData ? JSON.parse(userData)["fid"] : null
 
   const [fidSuggestions, setFidSuggestions] = useState<Array<UserInfoProp>>([])
 
   useEffect(() => {
     const updateFidSuggestions = async () => {
       const listOfSuggestions = await getSuggestions(fid)
-      console.log("[DEBUG - sreens/suggestions.tsx] HERE", listOfSuggestions)
+      console.log(
+        "[DEBUG - sreens/suggestions.tsx] Received non-null suggestions",
+        listOfSuggestions ? true : false
+      )
 
       setFidSuggestions(listOfSuggestions)
     }
 
     updateFidSuggestions()
   }, [fid])
+
   return (
     <>
-      {" "}
       {fidSuggestions ? (
         <Container>
-          <Title fontSize="16px">Find a buddy</Title>
-          {fidSuggestions.slice(0, 5).map((user) => (
-            <UserCard userInfo={user} />
+          <Title
+            fontSize="16px"
+            withTooltip={true}
+            tooltipText="The list of buddies that is generated using OpenRank algorithms">
+            Find a buddy
+          </Title>
+          {fidSuggestions.slice(0, 5).map((user, index) => (
+            <UserCard key={index} userInfo={user} />
           ))}
         </Container>
       ) : null}
@@ -56,21 +62,32 @@ const Container = styled.div`
 
 export const addSuggestionsSection = () => {
   if (window.location.href.includes("https://warpcast.com/")) {
-    const suggestionsSectionName = "warpdrive-suggestions-section"
-    // Function to inject the script
-    const targetSelector =
-      "#root > div > div > div > aside.sticky.top-0.hidden.h-full.flex-shrink-0.flex-grow.flex-col.sm\\:flex.sm\\:max-w-\\[330px\\].pt-3 > div:nth-child(2)"
-    const targetElement = document.querySelector(targetSelector)
+    setTimeout(() => {
+      console.log("Timeout reached after 2 seconds")
+      const suggestionsSectionName = "warpdrive-suggestions-section"
+      // Function to inject the script
+      const targetSelector =
+        "#root > div > div > div > aside.sticky.top-0.hidden.h-full.flex-shrink-0.flex-grow.flex-col.sm\\:flex.sm\\:max-w-\\[330px\\].pt-3 > div:nth-child(2)"
+      const targetElement = document.querySelector(targetSelector)
 
-    if (targetElement && !document.getElementById(suggestionsSectionName)) {
-      // Create a new div element to host the React component
-      const rootElement = document.createElement("div")
-      rootElement.id = suggestionsSectionName
-      targetElement.insertAdjacentElement("afterend", rootElement) //.prepend(rootElement)
+      // console.log(document.querySelector("aside"))
 
-      // Render the React component inside the target element
-      ReactDOM.render(<OpenrankSuggestions />, rootElement)
-    }
+      console.log(
+        "HERE1",
+        targetElement,
+        document.getElementById(suggestionsSectionName)
+      )
+
+      if (targetElement && !document.getElementById(suggestionsSectionName)) {
+        // Create a new div element to host the React component
+        const rootElement = document.createElement("div")
+        rootElement.id = suggestionsSectionName
+        targetElement.insertAdjacentElement("afterend", rootElement) //.prepend(rootElement)
+
+        // Render the React component inside the target element
+        ReactDOM.render(<OpenrankSuggestions />, rootElement)
+      }
+    }, 2000)
   }
   return false
 }

@@ -4,12 +4,12 @@ interface UserInfo {
 }
 
 interface UserStat {
-  totalCasts: number
-  totalLikes: number
-  totalReplies: number
-  totalRecasts: number
+  currentTotalCasts: number
+  currentTotalLikes: number
+  currentTotalReplies: number
+  currentTotalRecasts: number
   totalFollowers: number
-  casts: CastsType
+  currentCasts: CastsType
 }
 
 interface CastsType {

@@ -21,7 +21,7 @@ export const UserCard = ({ userInfo }: { userInfo: UserInfoProp }) => {
         handleClick={() =>
           window.open(`https://warpcast.com/${userInfo.username}`)
         }>
-        Open
+        Contact
       </PrimaryButton>
     </UsersCardContainer>
   )
@@ -51,5 +51,3 @@ const UsersCardContainer = styled.div`
   width: 100%;
   align-items: center;
 `
-
-const Handle = styled.span``

@@ -14,6 +14,7 @@ import { StatPeriods } from "~components/screens/home"
 import type { AppContextInterface, Props, UserInfo, UserStat } from "~types"
 import { userAnalyticsHandler } from "~utils/analyticsImporter"
 import AuthService from "~utils/authService"
+import { getSuggestions, type UserInfoProp } from "~utils/openrankSuggestions"
 
 // [...] - is responsible for the type of a screen in the app.
 // This type is used in the code to understand where we need to show a specific screen
@@ -99,10 +100,13 @@ export const AppProvider: FC<Props> = ({ children }) => {
 
       // Get casts analytics per user for all his time
       // Analytics for the whole time
-      await userAnalyticsHandler({
-        fid: user.fid,
-        analyticsHandler: setUserAnalytics
-      })
+      await userAnalyticsHandler(
+        {
+          fid: user.fid,
+          analyticsHandler: setUserAnalytics
+        },
+        StatPeriods.all
+      )
 
       // Get casts analytics per user for last 7 days
       await userAnalyticsHandler(

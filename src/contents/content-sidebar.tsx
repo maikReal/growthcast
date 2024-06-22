@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client"
 
 import { OverlayContainer } from "~components/containers/OverlayContainer"
 import { AppMain } from "~components/screens/main"
+import { addSuggestionsSection } from "~components/screens/suggestions"
 import { AppProvider } from "~Context/AppContext"
 
 const sidebarId = "my-extension-sidebar"

@@ -7,13 +7,13 @@ import { SuccessScreen } from "./SuccessScreen"
 import { ThreadView } from "./ThreadView"
 
 export function AppMain() {
-  const { screen, fid, signerUuid } = useApp()
+  const { screen } = useApp()
 
   console.log("[DEBUG - screens/Main.tsx] Current screen:", screen)
 
   if (screen === ScreenState.Signin) {
     return <Signin />
-  } 
+  }
 
   if (screen === ScreenState.Home) {
     return <UserHome />

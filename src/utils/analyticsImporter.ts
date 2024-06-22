@@ -20,7 +20,7 @@ const userAnalyticsImporter = async (
   period: string = defaultPeriod
 ) => {
   const userData = await sendRequestSignal({
-    action: period == "all" ? "fetchAnalytics" : "fetchCastsByPeriod",
+    action: "fetchCastsByPeriod",
     metadata: {
       period: period,
       fid: analyticsRequestData.fid
@@ -115,7 +115,7 @@ const calculatePercentageDifference = (
   previous: number
 ): string => {
   if (previous == 0 || previous == null) {
-    return current == 0 ? "0%" : "no data"
+    return current == 0 ? "0%" : "-"
   }
   const difference = (((current - previous) / previous) * 100).toFixed(0)
   return `${difference.startsWith("-") ? difference : "+" + difference}%`

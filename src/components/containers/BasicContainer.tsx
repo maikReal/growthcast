@@ -9,7 +9,7 @@ export const BasicContainer = ({ children }: Props) => {
 const Layer = styled.div`
   display: flex;
   flex-direction: column;
-  width: 450px;
+  width: 500px;
   height: 100%;
   padding: 55px 45px;
   align-items: center;

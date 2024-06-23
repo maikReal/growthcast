@@ -1,16 +1,27 @@
 import styled from "styled-components"
 
 import { iconsFoAnalytics } from "~components/elements/Icons"
+import type { StatPeriods } from "~components/screens/home"
 import type { UserStat } from "~types"
 import type { PercentageDifferenceData } from "~utils/analyticsImporter"
 
+const fillAnalyticalCellIfFull = (value: number) => {
+  return value ? value : 0
+}
+
+const fillAnalyticalDifferenceCellIfFull = (value: number) => {
+  return value ? value : 0
+}
+
 // TODO: Add as a param an array of values for the stat
 export const UserAnalytics = ({
-  prop,
-  changesInPercentage
+  userAnalytics,
+  changesInPercentage,
+  periodType
 }: {
-  prop: UserStat
-  changesInPercentage: PercentageDifferenceData
+  userAnalytics: UserStat
+  periodType: StatPeriods
+  changesInPercentage?: PercentageDifferenceData
 }) => {
   return (
     <Table>
@@ -18,28 +29,36 @@ export const UserAnalytics = ({
         <AnalyticalCell
           titleColor={"#8465CA"}
           titleText={"Your casts"}
-          cellValue={prop.totalCasts}
+          cellValue={fillAnalyticalCellIfFull(userAnalytics.currentTotalCasts)}
           iconType={"myCasts"}
           howChangedInPercentage={
-            changesInPercentage.totalCastsPercentageDifference
+            periodType !== "all"
+              ? changesInPercentage.totalCastsPercentageDifference
+              : null
           }
         />
         <AnalyticalCell
           titleColor={"#FF8C9E"}
           titleText={"Likes"}
-          cellValue={prop.totalLikes}
+          cellValue={fillAnalyticalCellIfFull(userAnalytics.currentTotalLikes)}
           iconType={"likes"}
           howChangedInPercentage={
-            changesInPercentage.totalLikesPercentageDifference
+            periodType !== "all"
+              ? changesInPercentage.totalLikesPercentageDifference
+              : null
           }
         />
         <AnalyticalCell
           titleColor={"#00B388"}
           titleText={"Recasts"}
-          cellValue={prop.totalRecasts}
+          cellValue={fillAnalyticalCellIfFull(
+            userAnalytics.currentTotalRecasts
+          )}
           iconType={"recasts"}
           howChangedInPercentage={
-            changesInPercentage.totalRecastsPercentageDifference
+            periodType !== "all"
+              ? changesInPercentage.totalRecastsPercentageDifference
+              : null
           }
         />
       </Row>
@@ -47,16 +66,20 @@ export const UserAnalytics = ({
         <AnalyticalCell
           titleColor={"#5F8EFF"}
           titleText={"Followers"}
-          cellValue={prop.totalFollowers}
+          cellValue={userAnalytics.totalFollowers}
           iconType={"followers"}
         />
         <AnalyticalCell
           titleColor={"#ECC99E"}
           titleText={"Replies"}
-          cellValue={prop.totalReplies}
+          cellValue={fillAnalyticalCellIfFull(
+            userAnalytics.currentTotalReplies
+          )}
           iconType={"replies"}
           howChangedInPercentage={
-            changesInPercentage.totalRepliesPercentageDifference
+            periodType !== "all"
+              ? changesInPercentage.totalRepliesPercentageDifference
+              : null
           }
         />
       </Row>
@@ -77,7 +100,7 @@ const AnalyticalCell = ({
   iconType: string
   howChangedInPercentage?: string
 }) => {
-  const changedValueColor =
+  let changedValueColor =
     howChangedInPercentage && howChangedInPercentage.startsWith("-")
       ? "#FF0000"
       : "#00A91B"

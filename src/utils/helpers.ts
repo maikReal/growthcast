@@ -19,7 +19,6 @@ export interface SignalMetadataProps {
 export const sendRequestSignal = async (
   requestData: SignalMetadataProps
 ): Promise<any> => {
-  console.log({ requestData })
   return new Promise((resolve, reject) => {
     chrome.runtime.sendMessage(
       {

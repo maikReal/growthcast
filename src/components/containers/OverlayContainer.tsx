@@ -3,6 +3,7 @@ import styled from "styled-components"
 
 import { CustomFloatButton } from "~components/elements/FloatButton"
 import { CloseIcon, OpenButtonArros } from "~components/elements/Icons"
+import { addSuggestionsSection } from "~components/screens/suggestions"
 import { ScreenState, useApp } from "~Context/AppContext"
 
 export const OverlayContainer = ({ children }) => {
@@ -19,39 +20,44 @@ export const OverlayContainer = ({ children }) => {
     setIsCloseBtnHovered(true)
   }
 
-  const unHoverCloseBtn = () => {
+  const unhoverCloseBtn = () => {
     setIsCloseBtnHovered(false)
   }
 
-  return isBackendLoggedIn ? (
+  return (
     <>
-      {isHide ? (
-        <OpenButton onClick={handleHidingOverlay} id="openButton">
-          <OpenButtonArros />
-          WarpDrive 🚀
-        </OpenButton>
-      ) : (
-        <CloseButton
-          onClick={handleHidingOverlay}
-          onMouseEnter={hoverCloseBtn}
-          onMouseLeave={unHoverCloseBtn}
-          id="closeButton">
-          <CloseIcon isCloseBtnHovered={isCloseBtnHovered} />
-        </CloseButton>
-      )}
-      {isHide ? (
-        ""
-      ) : (
+      {addSuggestionsSection()}
+      {isBackendLoggedIn ? (
         <>
-          <Container id="appDiv">
-            {children}
-            <CustomFloatButton handleSetScreen={setScreen} />
-          </Container>
+          {isHide ? (
+            <OpenButton onClick={handleHidingOverlay} id="openButton">
+              <OpenButtonArros />
+              WarpDrive 🚀
+            </OpenButton>
+          ) : (
+            <CloseButton
+              onClick={handleHidingOverlay}
+              onMouseEnter={hoverCloseBtn}
+              onMouseLeave={unhoverCloseBtn}
+              id="closeButton">
+              <CloseIcon isCloseBtnHovered={isCloseBtnHovered} />
+            </CloseButton>
+          )}
+          {isHide ? (
+            ""
+          ) : (
+            <>
+              <Container id="appDiv">
+                {children}
+                <CustomFloatButton handleSetScreen={setScreen} />
+              </Container>
+            </>
+          )}
         </>
+      ) : (
+        <></>
       )}
     </>
-  ) : (
-    <></>
   )
 }
 const OpenButton = styled.button`

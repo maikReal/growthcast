@@ -45,11 +45,13 @@ export function Signin() {
       <Container>
         <Title>Login to Warpcast</Title>
         <Description>
-          To use Warpdrive you need to login to your Warpcast account first. Use
+          To use Warpdrive, please log in to your Warpcast account first. Use
           the button below
         </Description>
       </Container>
-      {hasBetaAccess ? (
+      {getSignInBtn()}
+      {/* Part with the Beta testing access */}
+      {/* {hasBetaAccess ? (
         <>
           <span style={{ color: "#009220" }}>{message}</span>
           {getSignInBtn()}
@@ -65,7 +67,7 @@ export function Signin() {
           />
           <TestingButton onClick={handleEntering}>Get access</TestingButton>
         </AccessCodeContainer>
-      )}
+      )} */}
     </BasicContainer>
   )
 }

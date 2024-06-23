@@ -1,8 +1,11 @@
+import { Space } from "antd"
 import { useState } from "react"
 import styled from "styled-components"
 
 import { CustomLink } from "~components/elements/Link"
 import { Tab } from "~components/elements/Tabs"
+import { Title } from "~components/elements/TitleComponent"
+import { BasicTootlip } from "~components/elements/Tooltips"
 import { HeaderPageDescription } from "~components/sections/HeaderPageDescription"
 import { useApp } from "~Context/AppContext"
 import type { UserStat } from "~types"
@@ -13,6 +16,7 @@ import CastsStatistic from "../sections/CastsStatistic"
 import { UserAnalytics } from "../sections/UserAnalytics"
 
 export enum StatPeriods {
+  all = "all",
   compareWith7Days = "7days",
   compareWith14Days = "14days",
   compareWith30Days = "30days"
@@ -35,8 +39,14 @@ export const UserHome = () => {
   } = useApp()
   const defaultPeriodsBtns = [
     {
-      period: StatPeriods.compareWith7Days,
+      period: StatPeriods.all,
       isActive: true,
+      tabText: "All",
+      data: userAnalytics
+    },
+    {
+      period: StatPeriods.compareWith7Days,
+      isActive: false,
       tabText: "7 days",
       data: userAnalytic7Days
     },
@@ -71,6 +81,11 @@ export const UserHome = () => {
     return activeAnalytic ? activeAnalytic.data : null
   }
 
+  const getActiveTab = (analytics: StatPeriodsProp[]): any => {
+    const activeAnalytic = analytics.find((analytic) => analytic.isActive)
+    return activeAnalytic ? activeAnalytic.period : null
+  }
+
   console.log("[DEBUG - screens/home.tsx] User analytics:", userAnalytics)
   console.log(
     "[DEBUG - screens/home.tsx] Default user stats config:",
@@ -85,11 +100,12 @@ export const UserHome = () => {
             <HeaderPageDescription
               content={
                 <>
-                  Choose a time period that you want to use for the data
-                  comparison.
-                  <CustomLink href="https://maikyman.notion.site/Tendency-feature-7e3d389bb6c941b289bff7192f2e8df0?pvs=4">
-                    Get more details
-                  </CustomLink>
+                  <Space>
+                    Select a time period for data comparison.
+                    <CustomLink href="https://maikyman.notion.site/Tendency-feature-7e3d389bb6c941b289bff7192f2e8df0?pvs=4">
+                      Get more details
+                    </CustomLink>
+                  </Space>
                 </>
               }
             />
@@ -107,12 +123,22 @@ export const UserHome = () => {
               })}
             </TabsContainer>
             <UserAnalytics
-              prop={userAnalytics}
+              // There should be a different format of user analytics. Ther same as for period. Re-do
+              periodType={getActiveTab(statPeriods)}
+              userAnalytics={getCurrentStat(statPeriods)}
               changesInPercentage={calculateStatisticDifferences(
                 getCurrentStat(statPeriods)
               )}
             />
-            <CastsStatistic casts={userAnalytics.casts} />
+            <CastsStatContainer>
+              <Title
+                fontSize="16px"
+                withTooltip={true}
+                tooltipText="All your casts, which can be filtered by different metrics">
+                Total casts
+              </Title>
+              <CastsStatistic casts={userAnalytics.currentCasts} />
+            </CastsStatContainer>
           </BasicContainer>
         </>
       ) : (
@@ -121,6 +147,14 @@ export const UserHome = () => {
     </>
   )
 }
+
+const CastsStatContainer = styled.div`
+  display: flex;
+  row-gap: 15px;
+  flex-direction: column;
+  align-items: start;
+  width: 100%;
+`
 
 const TabsContainer = styled.div`
   display: flex;

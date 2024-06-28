@@ -55,9 +55,8 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  border-radius: 15px;
+  border-radius: 8px;
   padding: 13px 20px;
-  margin-bittom: 5px;
 `
 
 export const addSuggestionsSection = () => {

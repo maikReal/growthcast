@@ -181,3 +181,107 @@ export const getSuggestionsByFid = async (fid: string, token: string) => {
 
   return data
 }
+
+// Streaks
+
+export const getNumberOfStreaks = async (fid: string, token: string) => {
+  const fetchSuggestions = async () => {
+    return await fetch(
+      `${process.env.PLASMO_PUBLIC_DOMAIN}/api/webhook/get-fid-streaks/${fid}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    )
+  }
+
+  let response = await fetchSuggestions()
+
+  if (response.status === 403) {
+    console.log(
+      `[DEBUG - utils/proxy.ts] JWT token is expired during the request to /api/webhook/get-fid-streaks/${fid}, trying to refresh it. Previous error: `,
+      response.status,
+      response.statusText
+    )
+    await AuthService.refreshToken()
+    response = await fetchSuggestions()
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `[DEBUG - utils/proxy.ts] The external method /api/webhook/get-fid-streaks/${fid} returned a bad HTTP status: ${response.status} -> ${response.statusText}`
+    )
+  }
+  const data: number = await response.json()
+
+  return data
+}
+
+export const trackFidCasts = async (fid: string, token: string) => {
+  const fetchSuggestions = async () => {
+    return await fetch(
+      `${process.env.PLASMO_PUBLIC_DOMAIN}/api/webhook/start-tracking-fid/${fid}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    )
+  }
+
+  let response = await fetchSuggestions()
+
+  if (response.status === 403) {
+    console.log(
+      `[DEBUG - utils/proxy.ts] JWT token is expired during the request to /api/webhook/start-tracking-fid/${fid}, trying to refresh it. Previous error: `,
+      response.status,
+      response.statusText
+    )
+    await AuthService.refreshToken()
+    response = await fetchSuggestions()
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `[DEBUG - utils/proxy.ts] The external method /api/webhook/start-tracking-fid/${fid} returned a bad HTTP status: ${response.status} -> ${response.statusText}`
+    )
+  }
+  const data: boolean = await response.json()
+
+  return data
+}
+
+export const isFidCasted = async (fid: string, token: string) => {
+  const fetchSuggestions = async () => {
+    return await fetch(
+      `${process.env.PLASMO_PUBLIC_DOMAIN}/api/webhook/is-casted-today/${fid}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    )
+  }
+
+  let response = await fetchSuggestions()
+
+  if (response.status === 403) {
+    console.log(
+      `[DEBUG - utils/proxy.ts] JWT token is expired during the request to /api/webhook/start-tracking-fid/${fid}, trying to refresh it. Previous error: `,
+      response.status,
+      response.statusText
+    )
+    await AuthService.refreshToken()
+    response = await fetchSuggestions()
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `[DEBUG - utils/proxy.ts] The external method /api/webhook/start-tracking-fid/${fid} returned a bad HTTP status: ${response.status} -> ${response.statusText}`
+    )
+  }
+  const data: boolean = await response.json()
+
+  return data
+}

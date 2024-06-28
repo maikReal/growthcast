@@ -3,6 +3,7 @@ import styled from "styled-components"
 
 import { CustomFloatButton } from "~components/elements/FloatButton"
 import { CloseIcon, OpenButtonArros } from "~components/elements/Icons"
+import { addStreaks, Streaks } from "~components/elements/Streaks"
 import { addSuggestionsSection } from "~components/screens/suggestions"
 import { ScreenState, useApp } from "~Context/AppContext"
 
@@ -26,13 +27,14 @@ export const OverlayContainer = ({ children }) => {
 
   return (
     <>
+      {addStreaks()}
       {addSuggestionsSection()}
       {isBackendLoggedIn ? (
         <>
           {isHide ? (
             <OpenButton onClick={handleHidingOverlay} id="openButton">
               <OpenButtonArros />
-              WarpDrive 🚀
+              Growthcast 🚀
             </OpenButton>
           ) : (
             <CloseButton

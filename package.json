@@ -1,8 +1,8 @@
 {
-  "name": "warp-drive",
-  "displayName": "Warpdrive",
-  "version": "2.1.0",
-  "description": "Farcaster app that boosts your Web3 socials",
+  "name": "growthcast",
+  "displayName": "Growthcast",
+  "version": "4.0.0",
+  "description": "Grow faster on Farcaster",
   "author": "Mike Krupin",
   "scripts": {
     "clean": "rm -rf dist build",

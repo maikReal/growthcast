@@ -13,9 +13,10 @@ export const PopupSignedIn = () => {
   return (
     <BasicContainer>
       <Container>
-        <Title>Warpdrive is setup 🚀</Title>
+        <Title>It’s all set up 🚀</Title>
         <Description>
-          Warpdrive is ready to use. Go to Warpcast and start getting insights!
+          Growthcast is now available. Head over to Warpcast and begin gaining
+          insights!
         </Description>
       </Container>
       <WideButton

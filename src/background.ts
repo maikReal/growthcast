@@ -4,8 +4,11 @@ import {
   castThread,
   getCastsByPeriod,
   getChannels,
+  getNumberOfStreaks,
   getSuggestionsByFid,
-  getUserAnalytics
+  getUserAnalytics,
+  isFidCasted,
+  trackFidCasts
 } from "~utils/proxy"
 
 export {}
@@ -157,6 +160,60 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
 
   if (request.action === "fetchOpenrankSuggestions") {
     await getSuggestionsByFid(request.metadata.fid, request.token)
+      .then((data) => {
+        console.log(
+          `[DEBUG - background.ts] The request ${request.action} is successfully executed: `,
+          data
+        )
+        sendResponse({ data })
+      })
+      .catch((error) => {
+        console.error(
+          `[DEBUG - background.ts] Error during the execution of the ${request.action} request: `,
+          error
+        )
+        sendResponse({ error })
+      })
+  }
+
+  if (request.action === "trackFidCasts") {
+    await trackFidCasts(request.metadata.fid, request.token)
+      .then((data) => {
+        console.log(
+          `[DEBUG - background.ts] The request ${request.action} is successfully executed: `,
+          data
+        )
+        sendResponse({ data })
+      })
+      .catch((error) => {
+        console.error(
+          `[DEBUG - background.ts] Error during the execution of the ${request.action} request: `,
+          error
+        )
+        sendResponse({ error })
+      })
+  }
+
+  if (request.action === "getFidStreaks") {
+    await getNumberOfStreaks(request.metadata.fid, request.token)
+      .then((data) => {
+        console.log(
+          `[DEBUG - background.ts] The request ${request.action} is successfully executed: `,
+          data
+        )
+        sendResponse({ data })
+      })
+      .catch((error) => {
+        console.error(
+          `[DEBUG - background.ts] Error during the execution of the ${request.action} request: `,
+          error
+        )
+        sendResponse({ error })
+      })
+  }
+
+  if (request.action === "isFidCasted") {
+    await isFidCasted(request.metadata.fid, request.token)
       .then((data) => {
         console.log(
           `[DEBUG - background.ts] The request ${request.action} is successfully executed: `,

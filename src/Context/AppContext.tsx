@@ -14,7 +14,13 @@ import { StatPeriods } from "~components/screens/home"
 import type { AppContextInterface, Props, UserInfo, UserStat } from "~types"
 import { userAnalyticsHandler } from "~utils/analyticsImporter"
 import AuthService from "~utils/authService"
+import { isSameDate, sendRequestSignal } from "~utils/helpers"
 import { getSuggestions, type UserInfoProp } from "~utils/openrankSuggestions"
+import {
+  getAndSetStreaks,
+  isCastedToday,
+  startTrackingUsersCasts
+} from "~utils/streaksProcessing"
 
 // [...] - is responsible for the type of a screen in the app.
 // This type is used in the code to understand where we need to show a specific screen
@@ -93,7 +99,6 @@ export const AppProvider: FC<Props> = ({ children }) => {
   useEffect(() => {
     lookupUser()
 
-    // Setup a timeout here to not make a requests to API every time
     const handleUserAnalytics = async () => {
       // TODO: Add later to manual analytics update.
       // User clicks on a button and we make a request to update data

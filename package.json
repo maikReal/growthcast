@@ -1,7 +1,7 @@
 {
   "name": "growthcast",
   "displayName": "Growthcast",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "Grow faster on Farcaster",
   "author": "Mike Krupin",
   "scripts": {
@@ -62,14 +62,18 @@
       "background",
       "http://localhost:3000/*",
       "https://proxy.warp-drive.xyz/*",
-      "https://dev.warp-drive.xyz/*"
+      "https://dev.warp-drive.xyz/*",
+      "https://dev.growthcast.xyz/*",
+      "https://proxy.growthcast.xyz/*"
     ],
     "content_scripts": [
       {
         "matches": [
           "http://localhost:3000/*",
           "https://proxy.warp-drive.xyz/*",
-          "https://dev.warp-drive.xyz/*"
+          "https://dev.warp-drive.xyz/*",
+          "https://dev.growthcast.xyz/*",
+          "https://proxy.growthcast.xyz/*"
         ],
         "js": [
           "../src/contents/content.ts"

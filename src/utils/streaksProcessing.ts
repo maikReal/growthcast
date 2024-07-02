@@ -27,6 +27,19 @@ export const isCastedToday = async (fid: string) => {
   return response
 }
 
+export const isCastedPreviousWeeks = async (fid: string) => {
+  const response = await sendRequestSignal({
+    action: "isFidCastedPreviousWeeks",
+    metadata: {
+      fid: fid
+    }
+  })
+
+  console.log("[DEBUG - utils/streaksProcessing.ts] isCasted: ", response)
+
+  return response
+}
+
 export const getAndSetStreaks = async (fid: string) => {
   const response = await sendRequestSignal({
     action: "getFidStreaks",

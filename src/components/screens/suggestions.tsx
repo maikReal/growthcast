@@ -7,7 +7,8 @@ import { UserCard } from "~components/elements/UserCard"
 import { getSuggestions, type UserInfoProp } from "~utils/openrankSuggestions"
 
 export const OpenrankSuggestions = () => {
-  const userData = localStorage.getItem("user-data") || null
+  const userData =
+    localStorage.getItem(process.env.PLASMO_PUBLIC_GROWTHCAST_USER_DATA) || null
 
   const fid = userData ? JSON.parse(userData)["fid"] : null
 
@@ -59,34 +60,67 @@ const Container = styled.div`
   padding: 13px 20px;
 `
 
+// Function to add suggestions section
 export const addSuggestionsSection = () => {
-  if (window.location.href.includes("https://warpcast.com/")) {
-    setTimeout(() => {
-      console.log("Timeout reached after 2 seconds")
-      const suggestionsSectionName = "warpdrive-suggestions-section"
-      // Function to inject the script
-      const targetSelector =
-        "#root > div > div > div > aside.sticky.top-0.hidden.h-full.flex-shrink-0.flex-grow.flex-col.sm\\:flex.sm\\:max-w-\\[330px\\].pt-3 > div:nth-child(2)"
+  const suggestionsSectionName = "warpdrive-suggestions-section"
+  const targetSelector =
+    "#root > div > div > div > aside.sticky.top-0.hidden.h-full.flex-shrink-0.flex-grow.flex-col.sm\\:flex.sm\\:max-w-\\[330px\\].pt-3 > div:nth-child(2)"
+
+  const renderSuggestionsSection = () => {
+    if (window.location.href.includes("https://warpcast.com/")) {
+      console.log("Rendering suggestions section")
       const targetElement = document.querySelector(targetSelector)
-
-      // console.log(document.querySelector("aside"))
-
-      console.log(
-        "HERE1",
-        targetElement,
-        document.getElementById(suggestionsSectionName)
-      )
 
       if (targetElement && !document.getElementById(suggestionsSectionName)) {
         // Create a new div element to host the React component
         const rootElement = document.createElement("div")
         rootElement.id = suggestionsSectionName
-        targetElement.insertAdjacentElement("afterend", rootElement) //.prepend(rootElement)
+        targetElement.insertAdjacentElement("afterend", rootElement)
 
         // Render the React component inside the target element
         ReactDOM.render(<OpenrankSuggestions />, rootElement)
       }
-    }, 2000)
+    }
   }
-  return false
+
+  const removeSuggestionsSection = () => {
+    const element = document.getElementById(suggestionsSectionName)
+    if (element) {
+      element.parentNode?.removeChild(element)
+      console.log(`Element with ID '${suggestionsSectionName}' removed.`)
+    }
+  }
+
+  const checkUrlAndAct = () => {
+    const targetUrl = "https://warpcast.com/~/inbox"
+    if (window.location.href.includes(targetUrl)) {
+      removeSuggestionsSection()
+    } else {
+      renderSuggestionsSection()
+    }
+  }
+
+  // Override history methods to detect URL changes
+  const pushState = history.pushState
+  history.pushState = function (...args) {
+    pushState.apply(history, args)
+    checkUrlAndAct()
+  }
+
+  const replaceState = history.replaceState
+  history.replaceState = function (...args) {
+    replaceState.apply(history, args)
+    checkUrlAndAct()
+  }
+
+  // Listen for URL changes through popstate and hashchange events
+  window.addEventListener("popstate", checkUrlAndAct)
+  window.addEventListener("hashchange", checkUrlAndAct)
+
+  // Use MutationObserver to detect changes in the DOM
+  const observer = new MutationObserver(checkUrlAndAct)
+  observer.observe(document, { childList: true, subtree: true })
+
+  // Initial check in case the URL matches when the script loads
+  checkUrlAndAct()
 }

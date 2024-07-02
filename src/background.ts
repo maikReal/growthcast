@@ -8,6 +8,7 @@ import {
   getSuggestionsByFid,
   getUserAnalytics,
   isFidCasted,
+  isFidCastedPreviousWeeks,
   trackFidCasts
 } from "~utils/proxy"
 
@@ -30,7 +31,10 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
       JSON.parse(message.newValue)
     )
 
-    await storage.set("user-data", JSON.parse(message.newValue))
+    await storage.set(
+      process.env.PLASMO_PUBLIC_GROWTHCAST_USER_DATA,
+      JSON.parse(message.newValue)
+    )
   }
 })
 
@@ -41,10 +45,12 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     tab.url &&
     tab.url.includes("https://warpcast.com")
   ) {
-    const userData = await storage.get("user-data")
+    const userData = await storage.get(
+      process.env.PLASMO_PUBLIC_GROWTHCAST_USER_DATA
+    )
 
     console.log(
-      `[DEBUG - background.ts] Warpcast website is opened, adding user-data with a website localStorage: `,
+      `[DEBUG - background.ts] Warpcast website is opened, adding ${process.env.PLASMO_PUBLIC_GROWTHCAST_USER_DATA} with a website localStorage: `,
       userData
     )
 
@@ -214,6 +220,24 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
 
   if (request.action === "isFidCasted") {
     await isFidCasted(request.metadata.fid, request.token)
+      .then((data) => {
+        console.log(
+          `[DEBUG - background.ts] The request ${request.action} is successfully executed: `,
+          data
+        )
+        sendResponse({ data })
+      })
+      .catch((error) => {
+        console.error(
+          `[DEBUG - background.ts] Error during the execution of the ${request.action} request: `,
+          error
+        )
+        sendResponse({ error })
+      })
+  }
+
+  if (request.action === "isFidCastedPreviousWeeks") {
+    await isFidCastedPreviousWeeks(request.metadata.fid, request.token)
       .then((data) => {
         console.log(
           `[DEBUG - background.ts] The request ${request.action} is successfully executed: `,

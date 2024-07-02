@@ -2,9 +2,10 @@ import { useEffect, useState } from "react"
 import ReactDOM from "react-dom"
 import styled from "styled-components"
 
-import { isSameDate } from "~utils/helpers"
+import { isCurrentDayInCalendarWeek, isSameDate } from "~utils/helpers"
 import {
   getAndSetStreaks,
+  isCastedPreviousWeeks,
   isCastedToday,
   startTrackingUsersCasts
 } from "~utils/streaksProcessing"
@@ -18,12 +19,18 @@ export const Streaks = () => {
   let isContinuedStreak = null
 
   if (lastStreaksFetchingDate) {
-    const currentDate = new Date().toDateString()
-    isContinuedStreak =
-      new Date(lastStreaksFetchingDate).toDateString() == currentDate
+    isContinuedStreak = isCurrentDayInCalendarWeek(
+      new Date(lastStreaksFetchingDate)
+    )
+
+    console.log(
+      "[DEBUG - components/elements/Streaks.tsx] Is streaked this week?",
+      isContinuedStreak
+    )
   }
 
-  const userData = localStorage.getItem("user-data") || null
+  const userData =
+    localStorage.getItem(process.env.PLASMO_PUBLIC_GROWTHCAST_USER_DATA) || null
 
   const fid = userData ? JSON.parse(userData)["fid"] : null
 
@@ -49,6 +56,34 @@ export const Streaks = () => {
 
       if (lastStreaksFetchTime) {
         const lastSteaksFetchDate = new Date(lastStreaksFetchTime)
+
+        // Backward compatibility -> to calculate weeks streaks of users who updated to 4.0.0
+        const stroageBackwardCompatibility = localStorage.getItem(
+          "growthcastStreaksBackwardCompatibility"
+        )
+        if (
+          lastSteaksFetchDate <= new Date("2024-07-03T00:00:00Z") &&
+          !stroageBackwardCompatibility
+        ) {
+          const castedPreviousWeeks = await isCastedPreviousWeeks(fid)
+
+          const streaks = await getAndSetStreaks(fid)
+
+          setStreaksNumber(streaks)
+
+          console.log(
+            `[DEBUG - components/elements/Streaks.tsx] Backward compatibility - updated a fid ${fid} streaks`,
+            castedPreviousWeeks
+          )
+
+          localStorage.setItem("growthcastStreaksBackwardCompatibility", "true")
+          localStorage.setItem(
+            "lastStreaksFetchTime",
+            todaysDate.toDateString()
+          )
+
+          return true
+        }
 
         if (!isSameDate(todaysDate, lastSteaksFetchDate)) {
           console.log(
@@ -86,22 +121,22 @@ export const Streaks = () => {
           return true
         }
       } else {
-        const castedToday = await isCastedToday(fid)
+        // Checking if a fid casted previously and add consecutive weeks to DB
+        // Then get the number of streaks
+        // We're calculating all previous casts while we're starting to track a user's casts
+        // const castedPreviousWeeks = isCastedPreviousWeeks(fid)
 
-        if (castedToday) {
-          localStorage.setItem(
-            "lastStreaksFetchTime",
-            todaysDate.toDateString()
-          )
+        console.log(
+          "[DEBUG - components/elements/Streaks.tsx] Fetching user's casts first time... "
+        )
 
-          const streaks = await getAndSetStreaks(fid)
+        localStorage.setItem("lastStreaksFetchTime", todaysDate.toDateString())
 
-          setStreaksNumber(streaks)
+        const streaks = await getAndSetStreaks(fid)
 
-          return true
-        }
+        setStreaksNumber(streaks)
 
-        return false
+        return true
       }
     }
 
@@ -127,16 +162,17 @@ export const Streaks = () => {
       <Title
         fontSize="16px"
         withTooltip={true}
-        tooltipText="Cast everyday publicly to grow your account">
+        tooltipText="Cast every week to keep your streak!"
+        additionalIcons="share"
+        metadata={{ fid: fid }}>
         Streaks
       </Title>
       <ContentContainer>
         <StreakImage streaksNumber={streakNumber} />
-
         <TextContainer>
           <Title fontSize="13px">
             {streakNumber
-              ? `\u{1F525} ${streakNumber} day streak`
+              ? `\u{1F525} ${streakNumber} week streak`
               : "🐣 Build your streak"}
           </Title>
           <Description alignText={"start"} fontSize="13px">
@@ -210,35 +246,67 @@ const TextContainer = styled.div`
 `
 
 export const addStreaks = () => {
-  if (window.location.href.includes("https://warpcast.com/")) {
-    setTimeout(() => {
+  const streaksElementId = "warpdrive-streaks"
+  const targetSelector =
+    "#root > div > div > div > aside.sticky.top-0.hidden.h-full.flex-shrink-0.flex-grow.flex-col.sm\\:flex.sm\\:max-w-\\[330px\\].pt-3 > div:nth-child(1)"
+
+  const renderStreaksSection = () => {
+    if (window.location.href.includes("https://warpcast.com/")) {
       console.log(
-        "[DEBUG - components/elements/Streaks.tsx] Streaks -- Timeout reached after 2 seconds"
+        "[DEBUG - components/elements/Streaks.tsx] Streaks -- Rendering streaks section"
       )
-      const streaksElementId = "warpdrive-streaks"
-      // Function to inject the script
-      const targetSelector =
-        "#root > div > div > div > aside.sticky.top-0.hidden.h-full.flex-shrink-0.flex-grow.flex-col.sm\\:flex.sm\\:max-w-\\[330px\\].pt-3 > div:nth-child(1)"
       const targetElement = document.querySelector(targetSelector)
-
-      // console.log(document.querySelector("aside"))
-
-      console.log(
-        "[DEBUG - components/elements/Streaks.tsx] Streaks -- content script",
-        targetElement,
-        document.getElementById(streaksElementId)
-      )
 
       if (targetElement && !document.getElementById(streaksElementId)) {
         // Create a new div element to host the React component
         const rootElement = document.createElement("div")
         rootElement.id = streaksElementId
-        targetElement.insertAdjacentElement("afterend", rootElement) //.prepend(rootElement)
+        targetElement.insertAdjacentElement("afterend", rootElement)
 
         // Render the React component inside the target element
         ReactDOM.render(<Streaks />, rootElement)
       }
-    }, 2000)
+    }
   }
-  return false
+
+  const removeStreaksSection = () => {
+    const element = document.getElementById(streaksElementId)
+    if (element) {
+      element.parentNode?.removeChild(element)
+      console.log(`Element with ID '${streaksElementId}' removed.`)
+    }
+  }
+
+  const checkUrlAndAct = () => {
+    const targetUrl = "https://warpcast.com/~/inbox"
+    if (window.location.href.includes(targetUrl)) {
+      removeStreaksSection()
+    } else {
+      renderStreaksSection()
+    }
+  }
+
+  // Override history methods to detect URL changes
+  const pushState = history.pushState
+  history.pushState = function (...args) {
+    pushState.apply(history, args)
+    checkUrlAndAct()
+  }
+
+  const replaceState = history.replaceState
+  history.replaceState = function (...args) {
+    replaceState.apply(history, args)
+    checkUrlAndAct()
+  }
+
+  // Listen for URL changes through popstate and hashchange events
+  window.addEventListener("popstate", checkUrlAndAct)
+  window.addEventListener("hashchange", checkUrlAndAct)
+
+  // Use MutationObserver to detect changes in the DOM
+  const observer = new MutationObserver(checkUrlAndAct)
+  observer.observe(document, { childList: true, subtree: true })
+
+  // Initial check in case the URL matches when the script loads
+  checkUrlAndAct()
 }

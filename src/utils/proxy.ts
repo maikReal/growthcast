@@ -268,7 +268,7 @@ export const isFidCasted = async (fid: string, token: string) => {
 
   if (response.status === 403) {
     console.log(
-      `[DEBUG - utils/proxy.ts] JWT token is expired during the request to /api/webhook/start-tracking-fid/${fid}, trying to refresh it. Previous error: `,
+      `[DEBUG - utils/proxy.ts] JWT token is expired during the request to /api/webhook/is-casted-today/${fid}, trying to refresh it. Previous error: `,
       response.status,
       response.statusText
     )
@@ -278,7 +278,41 @@ export const isFidCasted = async (fid: string, token: string) => {
 
   if (!response.ok) {
     throw new Error(
-      `[DEBUG - utils/proxy.ts] The external method /api/webhook/start-tracking-fid/${fid} returned a bad HTTP status: ${response.status} -> ${response.statusText}`
+      `[DEBUG - utils/proxy.ts] The external method /api/webhook/is-casted-today/${fid} returned a bad HTTP status: ${response.status} -> ${response.statusText}`
+    )
+  }
+  const data: boolean = await response.json()
+
+  return data
+}
+
+export const isFidCastedPreviousWeeks = async (fid: string, token: string) => {
+  const fetchSuggestions = async () => {
+    return await fetch(
+      `${process.env.PLASMO_PUBLIC_DOMAIN}/api/webhook/is-casted-previously/${fid}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    )
+  }
+
+  let response = await fetchSuggestions()
+
+  if (response.status === 403) {
+    console.log(
+      `[DEBUG - utils/proxy.ts] JWT token is expired during the request to /api/webhook/is-casted-previously/${fid}, trying to refresh it. Previous error: `,
+      response.status,
+      response.statusText
+    )
+    await AuthService.refreshToken()
+    response = await fetchSuggestions()
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `[DEBUG - utils/proxy.ts] The external method /api/webhook/is-casted-previously/${fid} returned a bad HTTP status: ${response.status} -> ${response.statusText}`
     )
   }
   const data: boolean = await response.json()

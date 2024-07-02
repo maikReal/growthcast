@@ -9,7 +9,7 @@ import { ScreenState, useApp } from "~Context/AppContext"
 
 export const OverlayContainer = ({ children }) => {
   const [isHide, setHide] = useState(true)
-  const { setScreen, isBackendLoggedIn } = useApp()
+  const { setScreen, isBackendLoggedIn, fid, signerUuid } = useApp()
   const [isCloseBtnHovered, setIsCloseBtnHovered] = useState(false)
 
   const handleHidingOverlay = () => {

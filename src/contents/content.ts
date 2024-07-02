@@ -13,7 +13,10 @@ function checkLocalStorageChange() {
       type: "LOCAL_STORAGE_CHANGED",
       newValue: currentValue
     })
+    return true
   }
+
+  return false
 }
 
 // Check the cahnges every second until we get changed data
@@ -22,12 +25,23 @@ console.log(
   isAuth,
   lastKnownValue
 )
-if (!isAuth) {
-  console.log("[DEBUG - content.ts] Checking if a local storage changed...")
-  setInterval(checkLocalStorageChange, 100)
-} else {
-  console.log(
-    "[DEBUG - content.ts] User is already logged in with a value: ",
-    isAuth
-  )
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
+
+async function waitForAuth() {
+  do {
+    isAuth = checkLocalStorageChange()
+    if (isAuth) {
+      break
+    }
+    await delay(5000)
+  } while (true)
+}
+
+;(async () => {
+  console.log("[DEBUG - content.ts] Checking if a local storage changed...")
+  await waitForAuth()
+  console.log("[DEBUG - content.ts] User is authenticated!", isAuth)
+})()

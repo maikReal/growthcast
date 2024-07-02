@@ -10,7 +10,9 @@ import { userAnalyticsCleaner } from "~utils/analyticsImporter"
 export function Settings() {
   const { pfp, displayName, fid, setIsBackendLoggedIn, isBackendLoggedIn } =
     useApp()
-  const [_, _1, removeUser] = useStorage<UserInfo>("user-data")
+  const [_, _1, removeUser] = useStorage<UserInfo>(
+    process.env.PLASMO_PUBLIC_GROWTHCAST_USER_DATA
+  )
 
   const handleSignout = () => {
     try {

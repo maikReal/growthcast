@@ -66,9 +66,27 @@ export const AppProvider: FC<Props> = ({ children }) => {
     useState<StatisticForPeriod | null>(null)
 
   const [user, setUser, removeUser] = useStorage<UserInfo | null>(
-    "user-data",
+    process.env.PLASMO_PUBLIC_GROWTHCAST_USER_DATA,
     null
   )
+
+  // Backward compatibility
+  // Change the naming that we're using in Growthcast
+  // const newUserDataNaming = localStorage.getItem(
+  //   process.env.PLASMO_PUBLIC_GROWTHCAST_USER_DATA
+  // )
+  // const oldUserDataNaming = localStorage.getItem(
+  //   process.env.PLASMO_PUBLIC_GROWTHCAST_USER_DATA_OLD_NAMING
+  // )
+
+  // if (!newUserDataNaming && oldUserDataNaming) {
+  //   localStorage.setItem(
+  //     process.env.PLASMO_PUBLIC_GROWTHCAST_USER_DATA,
+  //     oldUserDataNaming
+  //   )
+
+  //   setUser(JSON.parse(oldUserDataNaming))
+  // }
 
   console.log(
     "[DEBUG] Current state in the AppContext.tsx: ",

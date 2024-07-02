@@ -71,3 +71,15 @@ export const isSameDate = (date1: Date, date2: Date): boolean => {
     date1.getDate() === date2.getDate()
   )
 }
+
+export const isCurrentDayInCalendarWeek = (date: Date): boolean => {
+  const today = new Date()
+  const currentDayOfWeek = today.getDay() // 0 (Sunday) to 6 (Saturday)
+
+  // Define the start and end of the calendar week (Monday to Sunday)
+  const startOfWeek = 1 // Monday
+  const endOfWeek = 0 // Sunday (0 represents Sunday in getDay())
+
+  // Check if the current day is within the calendar week
+  return currentDayOfWeek >= startOfWeek || currentDayOfWeek === endOfWeek
+}

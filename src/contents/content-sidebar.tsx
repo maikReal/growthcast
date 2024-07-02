@@ -26,6 +26,24 @@ if (!document.getElementById(sidebarId) && document.URL.includes(warpcastURL)) {
   const container = document.getElementById(sidebarId)
   const root = createRoot(container)
 
+  // Backward compatibility
+  // Change the naming that we're using in Growthcast
+  const newUserDataNaming = localStorage.getItem(
+    process.env.PLASMO_PUBLIC_GROWTHCAST_USER_DATA
+  )
+  const oldUserDataNaming = localStorage.getItem(
+    process.env.PLASMO_PUBLIC_GROWTHCAST_USER_DATA_OLD_NAMING
+  )
+
+  if (!newUserDataNaming && oldUserDataNaming) {
+    localStorage.setItem(
+      process.env.PLASMO_PUBLIC_GROWTHCAST_USER_DATA,
+      oldUserDataNaming
+    )
+
+    // localStorage.setItem(process.env.PLASMO_PUBLIC_GROWTHCAST_USER_DATA, JSON.parse(oldUserDataNaming))
+  }
+
   root.render(
     <AppProvider>
       <OverlayContainer>
@@ -41,7 +59,10 @@ if (!document.getElementById(sidebarId) && document.URL.includes(warpcastURL)) {
 // Receive a user data when a user opens a warpcast website
 chrome.runtime.onMessage.addListener(function (message) {
   if (message.type === "SHARE_DATA_WITH_CONTENT") {
-    localStorage.setItem("user-data", JSON.stringify(message.data))
+    localStorage.setItem(
+      process.env.PLASMO_PUBLIC_GROWTHCAST_USER_DATA,
+      JSON.stringify(message.data)
+    )
   }
 
   return true

@@ -1,4 +1,5 @@
 import { sendRequestSignal } from "./helpers"
+import { Logger } from "./logger"
 
 export interface UserInfoProp {
   fid: string
@@ -9,9 +10,18 @@ export interface UserInfoProp {
   profileUrl: string | null
 }
 
-const SUGGESTIONS_STORAGE_KEY = "openrankSuggestions"
-const SUGGESTIONS_TIMESTAMP_KEY = "openrankSuggestionsTimestamp"
-const SUGGESTIONS_SHOWN_KEY = "shownOpenrankSuggestions"
+const SUGGESTIONS_STORAGE_KEY = process.env
+  .PLASMO_PUBLIC_LOCAL_VAR_OPENRANK_DATA
+  ? process.env.PLASMO_PUBLIC_LOCAL_VAR_OPENRANK_DATA
+  : "openrankSuggestions"
+const SUGGESTIONS_TIMESTAMP_KEY = process.env
+  .PLASMO_PUBLIC_LOCAL_VAR_OPENRANK_FETCH_DATE
+  ? process.env.PLASMO_PUBLIC_LOCAL_VAR_OPENRANK_FETCH_DATE
+  : "openrankSuggestionsTimestamp"
+const SUGGESTIONS_SHOWN_KEY = process.env
+  .PLASMO_PUBLIC_LOCAL_VAR_OPENRANK_SHOWN_DATA
+  ? process.env.PLASMO_PUBLIC_LOCAL_VAR_OPENRANK_SHOWN_DATA
+  : "shownOpenrankSuggestions"
 
 export const getSuggestions = async (fid: string): Promise<UserInfoProp[]> => {
   const fetchSuggestions = async () => {
@@ -34,8 +44,9 @@ export const getSuggestions = async (fid: string): Promise<UserInfoProp[]> => {
 
       return suggestionsList
     } catch (error) {
-      console.error("Failed to fetch data:", error)
-      throw Error
+      Logger.logError(
+        `Failed to fetch suggestions from OpenRank\n The error: ${error}`
+      )
     }
   }
 
@@ -54,8 +65,8 @@ export const getSuggestions = async (fid: string): Promise<UserInfoProp[]> => {
 
   if (now - lastRequestTime > thirtyMinutes) {
     // Make a new request
-    console.log(
-      "[DEBUG - utils/openrankSuggestions.ts] The last updated time was expired. Requesting new data from backend"
+    Logger.logInfo(
+      "The last updated time was expired. Requesting new data from backend..."
     )
     suggestionsList = await fetchSuggestions()
   } else {
@@ -69,17 +80,16 @@ export const getSuggestions = async (fid: string): Promise<UserInfoProp[]> => {
   let nonShownSuggestions = suggestionsList.filter(
     (obj) => !shownObjects.includes(obj.fid)
   )
-  console.log(
-    "[DEBUG - utils/openrankSuggestions.ts] Previously shown FIDs were filtered. The number of non shown FIDs: ",
-    nonShownSuggestions.length
+  Logger.logInfo(
+    `Previously shown FIDs were filtered. The number of non shown FIDs: ${nonShownSuggestions.length}`
   )
 
   if (!nonShownSuggestions || nonShownSuggestions.length === 0) {
     suggestionsList = await fetchSuggestions()
     shownObjects = []
 
-    console.log(
-      "[DEBUG - utils/openrankSuggestions.ts] All values were shown, added new values from backend"
+    Logger.logInfo(
+      "All values were shown to a user. Fetching new suggestions from the backend..."
     )
 
     nonShownSuggestions = suggestionsList.filter(
@@ -108,9 +118,7 @@ export const getSuggestions = async (fid: string): Promise<UserInfoProp[]> => {
     SUGGESTIONS_SHOWN_KEY,
     JSON.stringify(updatedShownObjects)
   )
-  console.log(
-    "[DEBUG - utils/openrankSuggestions.ts] New updated time was added to the local storage"
-  )
+  Logger.logInfo("New updated time was added to the local storage!")
 
   return suggestionsToShow
 }

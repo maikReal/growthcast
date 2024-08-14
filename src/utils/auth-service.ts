@@ -1,3 +1,5 @@
+import { Logger } from "./logger"
+
 export default class AuthService {
   static async login(username: string) {
     const response = await fetch(
@@ -9,8 +11,8 @@ export default class AuthService {
     )
 
     if (!response.ok) {
-      throw new Error(
-        `[DEBUG - utils/AuthService.ts] The external method /api/auth returned a bad HTTP status: ${response.status} -> ${response.statusText}`
+      Logger.logError(
+        `The external method /api/auth returned a bad HTTP status: ${response.status} -> ${response.statusText}`
       )
     }
 
@@ -18,9 +20,7 @@ export default class AuthService {
     sessionStorage.setItem("token", data.accessToken)
     sessionStorage.setItem("refreshToken", data.refreshToken)
 
-    console.log(
-      "[DEBUG - utils/AuthService.ts] Tokens are successfully added to the local storage!"
-    )
+    Logger.logInfo("Tokens are successfully added to the local storage!")
   }
 
   static async refreshToken() {
@@ -34,8 +34,8 @@ export default class AuthService {
     )
 
     if (!response.ok) {
-      throw new Error(
-        `[DEBUG - utils/AuthService.ts] The external method /api/refresh-token returned a bad HTTP status: ${response.status} -> ${response.statusText}`
+      Logger.logError(
+        `The external method /api/refresh-token returned a bad HTTP status: ${response.status} -> ${response.statusText}`
       )
     }
 

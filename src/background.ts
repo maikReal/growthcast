@@ -1,34 +1,31 @@
 import { Storage } from "@plasmohq/storage"
 
+import { Logger } from "~utils/logger"
 import {
   castThread,
   getCastsByPeriod,
   getChannels,
-  getNumberOfStreaks,
+  getOverallAnalytics,
+  getPaginatedCasts,
   getSuggestionsByFid,
-  getUserAnalytics,
-  isFidCasted,
-  isFidCastedPreviousWeeks,
-  trackFidCasts
+  isUserDataFetched
 } from "~utils/proxy"
 
 export {}
-console.log("[DEBUG - background.ts] The background script is working!")
 
 const storage = new Storage()
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message) => {
   if (message.type === "USER_DATA") {
-    console.log("Received user data from content script:", message.data)
+    Logger.logInfo(`Received user data from content script: ${message.data}`)
   }
 })
 
 // Check when a localStorage will change after the authorization to get all necessary data
-chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (message) => {
   if (message.type === "LOCAL_STORAGE_CHANGED") {
-    console.log(
-      `[DEBUG - background.ts] Received user data after the login:`,
-      JSON.parse(message.newValue)
+    Logger.logInfo(
+      `Received user data after the login: ${JSON.parse(message.newValue)}`
     )
 
     await storage.set(
@@ -49,9 +46,8 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
       process.env.PLASMO_PUBLIC_GROWTHCAST_USER_DATA
     )
 
-    console.log(
-      `[DEBUG - background.ts] Warpcast website is opened, adding ${process.env.PLASMO_PUBLIC_GROWTHCAST_USER_DATA} with a website localStorage: `,
-      userData
+    Logger.logInfo(
+      `Warpcast website is opened, adding ${process.env.PLASMO_PUBLIC_GROWTHCAST_USER_DATA} with a website localStorage: ${userData}`
     )
 
     // Send a message to the content script
@@ -73,9 +69,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       () => {
         if (chrome.runtime.lastError) {
           sendResponse({ success: false })
-          console.error(
-            "[DEBUG - background.ts] Error injecting content-sidebar script for WarpDrive opening: ",
-            chrome.runtime.lastError
+          Logger.logError(
+            `Error injecting content-sidebar script: ${chrome.runtime.lastError}`
           )
         } else {
           sendResponse({ success: true })
@@ -88,170 +83,41 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // The listenere that is responsible for making request to the backend service
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
-  if (request.action === "castThread") {
-    await castThread(request.metadata.threadData, request.token)
-      .then((data) => {
-        console.log(
-          `[DEBUG - background.ts] The request ${request.action} is successfully executed: `,
-          data
-        )
-        sendResponse({ data })
-      })
-      .catch((error) => {
-        console.error(
-          `[DEBUG - background.ts] Error during the execution of the ${request.action} request: `,
-          error
-        )
-        sendResponse({ error })
-      })
+  async function handleRequest(action: string, handler: any, ...params: any) {
+    try {
+      const data = await handler(...params)
+      Logger.logInfo(
+        `The request ${action} is successfully executed\nResponse: ${data}`
+      )
+      sendResponse({ data })
+    } catch (error) {
+      Logger.logError(
+        `Error during the execution of ${action} request: ${error}`
+      )
+      sendResponse({ error })
+    }
   }
 
-  if (request.action === "fetchChannels") {
-    await getChannels(request.metadata.fid, request.token)
-      .then((data) => {
-        console.log(
-          `[DEBUG - background.ts] The request ${request.action} is successfully executed: `,
-          data
-        )
-        sendResponse({ data })
-      })
-      .catch((error) => {
-        console.error(
-          `[DEBUG - background.ts] Error during the execution of the ${request.action} request: `,
-          error
-        )
-        sendResponse({ error })
-      })
+  const actionHandlers = {
+    castThread: (metadata: any, token: string) =>
+      castThread(metadata.threadData, token),
+    fetchChannels: (metadata: any, token: string) =>
+      getChannels(metadata.fid, token),
+    isUserDataFetched: (metadata: any, token: string) =>
+      isUserDataFetched(metadata.fid, token),
+    fetchCastsByPeriod: (metadata: any, token: string) =>
+      getCastsByPeriod(metadata.fid, token, metadata.period),
+    fetchOpenrankSuggestions: (metadata: any, token: string) =>
+      getSuggestionsByFid(metadata.fid, token),
+    fetchOverallAnalytics: (metadata: any, token: string) =>
+      getOverallAnalytics(metadata.fid, token),
+    fetchPaginatedCast: (metadata: any, token: string) =>
+      getPaginatedCasts(metadata.fid, metadata.pageToken, token)
   }
 
-  if (request.action === "fetchAnalytics") {
-    await getUserAnalytics(request.metadata.fid, request.token)
-      .then((data) => {
-        console.log(
-          `[DEBUG - background.ts] The request ${request.action} is successfully executed: `,
-          data
-        )
-        sendResponse({ data })
-      })
-      .catch((error) => {
-        console.error(
-          `[DEBUG - background.ts] Error during the execution of the ${request.action} request: `,
-          error
-        )
-        sendResponse({ error })
-      })
-  }
-
-  if (request.action === "fetchCastsByPeriod") {
-    await getCastsByPeriod(
-      request.metadata.fid,
-      request.token,
-      request.metadata.period
-    )
-      .then((data) => {
-        console.log(
-          `[DEBUG - background.ts] The request ${request.action} is successfully executed: `,
-          data
-        )
-        sendResponse({ data })
-      })
-      .catch((error) => {
-        console.error(
-          `[DEBUG - background.ts] Error during the execution of the ${request.action} request: `,
-          error
-        )
-        sendResponse({ error })
-      })
-  }
-
-  if (request.action === "fetchOpenrankSuggestions") {
-    await getSuggestionsByFid(request.metadata.fid, request.token)
-      .then((data) => {
-        console.log(
-          `[DEBUG - background.ts] The request ${request.action} is successfully executed: `,
-          data
-        )
-        sendResponse({ data })
-      })
-      .catch((error) => {
-        console.error(
-          `[DEBUG - background.ts] Error during the execution of the ${request.action} request: `,
-          error
-        )
-        sendResponse({ error })
-      })
-  }
-
-  if (request.action === "trackFidCasts") {
-    await trackFidCasts(request.metadata.fid, request.token)
-      .then((data) => {
-        console.log(
-          `[DEBUG - background.ts] The request ${request.action} is successfully executed: `,
-          data
-        )
-        sendResponse({ data })
-      })
-      .catch((error) => {
-        console.error(
-          `[DEBUG - background.ts] Error during the execution of the ${request.action} request: `,
-          error
-        )
-        sendResponse({ error })
-      })
-  }
-
-  if (request.action === "getFidStreaks") {
-    await getNumberOfStreaks(request.metadata.fid, request.token)
-      .then((data) => {
-        console.log(
-          `[DEBUG - background.ts] The request ${request.action} is successfully executed: `,
-          data
-        )
-        sendResponse({ data })
-      })
-      .catch((error) => {
-        console.error(
-          `[DEBUG - background.ts] Error during the execution of the ${request.action} request: `,
-          error
-        )
-        sendResponse({ error })
-      })
-  }
-
-  if (request.action === "isFidCasted") {
-    await isFidCasted(request.metadata.fid, request.token)
-      .then((data) => {
-        console.log(
-          `[DEBUG - background.ts] The request ${request.action} is successfully executed: `,
-          data
-        )
-        sendResponse({ data })
-      })
-      .catch((error) => {
-        console.error(
-          `[DEBUG - background.ts] Error during the execution of the ${request.action} request: `,
-          error
-        )
-        sendResponse({ error })
-      })
-  }
-
-  if (request.action === "isFidCastedPreviousWeeks") {
-    await isFidCastedPreviousWeeks(request.metadata.fid, request.token)
-      .then((data) => {
-        console.log(
-          `[DEBUG - background.ts] The request ${request.action} is successfully executed: `,
-          data
-        )
-        sendResponse({ data })
-      })
-      .catch((error) => {
-        console.error(
-          `[DEBUG - background.ts] Error during the execution of the ${request.action} request: `,
-          error
-        )
-        sendResponse({ error })
-      })
+  const { action, metadata, token } = request
+  if (actionHandlers[action]) {
+    await handleRequest(action, actionHandlers[action], metadata, token)
   }
 
   return true

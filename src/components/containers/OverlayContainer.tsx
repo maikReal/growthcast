@@ -3,9 +3,8 @@ import styled from "styled-components"
 
 import { CustomFloatButton } from "~components/elements/FloatButton"
 import { CloseIcon, OpenButtonArros } from "~components/elements/Icons"
-import { addStreaks, Streaks } from "~components/elements/Streaks"
 import { addSuggestionsSection } from "~components/screens/suggestions"
-import { ScreenState, useApp } from "~Context/AppContext"
+import { ScreenState, useApp } from "~Context/app-context"
 
 export const OverlayContainer = ({ children }) => {
   const [isHide, setHide] = useState(true)
@@ -27,8 +26,9 @@ export const OverlayContainer = ({ children }) => {
 
   return (
     <>
-      {addStreaks()}
-      {addSuggestionsSection()}
+      {Boolean(process.env?.PLASMO_PUBLIC_ENABLE_OPENRANK_SUGGESTIONS)
+        ? addSuggestionsSection()
+        : null}
       {isBackendLoggedIn ? (
         <>
           {isHide ? (

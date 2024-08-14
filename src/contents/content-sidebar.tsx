@@ -3,8 +3,7 @@ import { createRoot } from "react-dom/client"
 
 import { OverlayContainer } from "~components/containers/OverlayContainer"
 import { AppMain } from "~components/screens/main"
-import { addSuggestionsSection } from "~components/screens/suggestions"
-import { AppProvider } from "~Context/AppContext"
+import { AppProvider } from "~Context/app-context"
 
 const sidebarId = "my-extension-sidebar"
 const warpcastURL = "https://warpcast.com"
@@ -40,8 +39,6 @@ if (!document.getElementById(sidebarId) && document.URL.includes(warpcastURL)) {
       process.env.PLASMO_PUBLIC_GROWTHCAST_USER_DATA,
       oldUserDataNaming
     )
-
-    // localStorage.setItem(process.env.PLASMO_PUBLIC_GROWTHCAST_USER_DATA, JSON.parse(oldUserDataNaming))
   }
 
   root.render(

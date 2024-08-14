@@ -1,12 +1,10 @@
-import { ScreenState, useApp } from "~Context/AppContext"
+import { ScreenState, useApp } from "~Context/app-context"
 
-import { PopupSignedIn } from "./PopupSingedIn"
+import { PopupSignedIn } from "./popup-singedin-screen"
 import { Signin } from "./signin"
 
 export const PopupScreens = () => {
   const { screen } = useApp()
-
-  console.log("[DEBUG - screens/popupStates.tsx] Current screen:", screen)
 
   if (screen === ScreenState.Signin) {
     return <Signin />

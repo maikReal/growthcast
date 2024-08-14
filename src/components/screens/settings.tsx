@@ -2,17 +2,17 @@ import { useStorage } from "@plasmohq/storage/hook"
 
 import { BasicContainer } from "~components/containers/BasicContainer"
 import { WideButton } from "~components/elements/WideButton"
-import { HeaderPageDescription } from "~components/sections/HeaderPageDescription"
-import { useApp } from "~Context/AppContext"
-import type { UserInfo } from "~types"
-import { userAnalyticsCleaner } from "~utils/analyticsImporter"
+import { HeaderPageDescription } from "~components/sections/header-navigation"
+import { useApp } from "~Context/app-context"
+import { AnalyticsImporter } from "~utils/analytics-importer"
 
 export function Settings() {
-  const { pfp, displayName, fid, setIsBackendLoggedIn, isBackendLoggedIn } =
-    useApp()
+  const { fid, setIsBackendLoggedIn, isBackendLoggedIn } = useApp()
   const [_, _1, removeUser] = useStorage<UserInfo>(
     process.env.PLASMO_PUBLIC_GROWTHCAST_USER_DATA
   )
+
+  const analyticalManager = new AnalyticsImporter(fid)
 
   const handleSignout = () => {
     try {
@@ -21,7 +21,7 @@ export function Settings() {
 
       // Remove JWT tokens and logout a user from backend
       setIsBackendLoggedIn(!isBackendLoggedIn)
-      userAnalyticsCleaner()
+      analyticalManager.cleanAnalyticsDataInLocalStorage()
 
       // Reload a user's page
       window.location.reload()

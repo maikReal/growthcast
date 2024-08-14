@@ -1,5 +1,5 @@
 import { InfoCircleOutlined } from "@ant-design/icons"
-import { ConfigProvider, Tooltip } from "antd"
+import { Tooltip } from "antd"
 
 interface BasicTooltipProps {
   text?: string

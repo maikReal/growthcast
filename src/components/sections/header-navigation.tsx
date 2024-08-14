@@ -6,7 +6,7 @@ import styled from "styled-components"
 
 import { Description } from "~components/elements/DescriptionComponent"
 import { Title } from "~components/elements/TitleComponent"
-import { ScreenState, useApp } from "~Context/AppContext"
+import { ScreenState, useApp } from "~Context/app-context"
 
 export const HeaderPageDescription = ({ content }) => {
   const { screen, setScreen } = useApp()

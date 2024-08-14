@@ -3,10 +3,10 @@ import styled from "styled-components"
 
 import { ThreadContent } from "~components/elements/thread/ThreadContent"
 import { ThreadHeader } from "~components/elements/thread/ThreadHeader"
-import { HeaderPageDescription } from "~components/sections/HeaderPageDescription"
-import { ScreenState, useApp } from "~Context/AppContext"
-import type { InputState, ThreadInput } from "~types"
+import { HeaderPageDescription } from "~components/sections/header-navigation"
+import { ScreenState, useApp } from "~Context/app-context"
 import { prepareInputsForThreadCast, sendRequestSignal } from "~utils/helpers"
+import { Logger } from "~utils/logger"
 
 import { BasicContainer } from "../containers/BasicContainer"
 
@@ -19,10 +19,7 @@ export const ThreadView: React.FC = () => {
   const { fid, signerUuid, loading, setScreen } = useApp()
 
   const handleCastThread = async () => {
-    console.log(
-      "[DEBUG - screens/ThreadView.tsx] Casting a thread with content:",
-      inputs
-    )
+    Logger.logInfo(`Casting a thread with content: ${inputs}`)
 
     if (inputs && inputs.length > 1) {
       const preparedDataForThread: Array<ThreadInput> =

@@ -1,5 +1,5 @@
-import { PopupScreens } from "~components/screens/popupStates"
-import { AppProvider } from "~Context/AppContext"
+import { PopupScreens } from "~components/screens/popup-states"
+import { AppProvider } from "~Context/app-context"
 
 function IndexPopup() {
   return (

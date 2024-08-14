@@ -35,15 +35,6 @@ export function Signin() {
   )
 }
 
-const AccessCodeContainer = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  row-gap: 15px;
-`
-
 const Container = styled.div`
   display: flex;
   flex-direction: column;

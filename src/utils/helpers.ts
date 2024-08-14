@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken"
 import { v4 as uuidv4 } from "uuid"
 
-import type { InputState } from "~types"
+import { Logger } from "./logger"
 
 if (!process.env.PLASMO_PUBLIC_ENCRYPTION_KEY) {
   throw new Error(
@@ -28,14 +28,13 @@ export const sendRequestSignal = async (
       (response) => {
         if (response.error) {
           reject(response.error)
-          console.error(
-            `[DEBUG - utils/helpers.ts] Error during an execution of a ${requestData.action} method: `,
-            response.error
+          Logger.logError(
+            `Error during an execution of a ${requestData.action} method\nThe error: ${response.error}`
           )
         } else {
           resolve(response.data)
-          console.log(
-            `[DEBUG - utils/helpers.ts] The method ${requestData.action} was succesfully executed:`
+          Logger.logError(
+            `The method ${requestData.action} was succesfully executed!`
           )
         }
       }
@@ -49,7 +48,7 @@ export const generateToken = () => {
       expiresIn: "1h"
     })
   } catch (error) {
-    console.error("[DEBUG - utils/helpers.ts] Error generating JWT:", error)
+    Logger.logError(`Error generating JWT token\n The error: ${error}`)
     return null
   }
 }

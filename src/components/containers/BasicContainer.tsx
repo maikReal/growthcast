@@ -1,8 +1,7 @@
+import type { ReactNode } from "react"
 import styled from "styled-components"
 
-import type { Props } from "~types"
-
-export const BasicContainer = ({ children }: Props) => {
+export const BasicContainer = ({ children }: { children: ReactNode }) => {
   return <Layer>{children}</Layer>
 }
 

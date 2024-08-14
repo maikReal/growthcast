@@ -1,5 +1,5 @@
 import { AppMain } from "~components/screens/main"
-import { AppProvider } from "~Context/AppContext"
+import { AppProvider } from "~Context/app-context"
 
 function IndexPage() {
   return (

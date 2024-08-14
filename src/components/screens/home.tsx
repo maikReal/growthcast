@@ -5,44 +5,27 @@ import styled from "styled-components"
 import { CustomLink } from "~components/elements/Link"
 import { Tab } from "~components/elements/Tabs"
 import { Title } from "~components/elements/TitleComponent"
-import { BasicTootlip } from "~components/elements/Tooltips"
-import { HeaderPageDescription } from "~components/sections/HeaderPageDescription"
-import { useApp } from "~Context/AppContext"
-import type { UserStat } from "~types"
-import { calculateStatisticDifferences } from "~utils/analyticsImporter"
+import { HeaderPageDescription } from "~components/sections/header-navigation"
+import { StatPeriods, useApp } from "~Context/app-context"
 
 import { BasicContainer } from "../containers/BasicContainer"
-import CastsStatistic from "../sections/CastsStatistic"
-import { UserAnalytics } from "../sections/UserAnalytics"
-
-export enum StatPeriods {
-  all = "all",
-  compareWith7Days = "7days",
-  compareWith14Days = "14days",
-  compareWith30Days = "30days"
-}
-
-interface StatPeriodsProp {
-  period: string
-  isActive: boolean
-  tabText: string
-  data: UserStat
-}
+import CastsStatistic from "../sections/casts-statistic"
+import { UserAnalytics } from "../sections/user-overall-analytics"
 
 export const UserHome = () => {
   const {
-    userAnalytics,
+    overallUserAnalytics,
     userAnalytic7Days,
     userAnalytics14Days,
-    userAnalytics30Days,
-    setScreen
+    userAnalytics30Days
   } = useApp()
-  const defaultPeriodsBtns = [
+
+  const defaultPeriodsBtns: StatPeriodsProp[] = [
     {
       period: StatPeriods.all,
       isActive: true,
       tabText: "All",
-      data: userAnalytics
+      data: overallUserAnalytics
     },
     {
       period: StatPeriods.compareWith7Days,
@@ -63,84 +46,66 @@ export const UserHome = () => {
       data: userAnalytics30Days
     }
   ]
+
   const [statPeriods, setStatPeriods] =
     useState<StatPeriodsProp[]>(defaultPeriodsBtns)
 
-  const handleButtonClick = (currentPeriod: string) => {
+  const handleButtonClick = (currentPeriod: StatPeriods) => {
     setStatPeriods(
-      statPeriods.map((button) =>
-        button.period === currentPeriod
-          ? { ...button, isActive: true }
-          : { ...button, isActive: false }
-      )
+      statPeriods.map((button) => ({
+        ...button,
+        isActive: button.period === currentPeriod
+      }))
     )
   }
 
-  const getCurrentStat = (analytics: StatPeriodsProp[]): any => {
-    const activeAnalytic = analytics.find((analytic) => analytic.isActive)
-    return activeAnalytic ? activeAnalytic.data : null
-  }
+  const getActiveTab = () => statPeriods.find((analytic) => analytic.isActive)
 
-  const getActiveTab = (analytics: StatPeriodsProp[]): any => {
-    const activeAnalytic = analytics.find((analytic) => analytic.isActive)
-    return activeAnalytic ? activeAnalytic.period : null
-  }
-
-  console.log("[DEBUG - screens/home.tsx] User analytics:", userAnalytics)
-  console.log(
-    "[DEBUG - screens/home.tsx] Default user stats config:",
-    defaultPeriodsBtns
-  )
+  const activeTab = getActiveTab()
 
   return (
     <>
-      {userAnalytics ? (
-        <>
-          <BasicContainer>
-            <HeaderPageDescription
-              content={
-                <>
-                  <Space>
-                    Select a time period for data comparison.
-                    <CustomLink href="https://maikyman.notion.site/Tendency-feature-7e3d389bb6c941b289bff7192f2e8df0?pvs=4">
-                      Get more details
-                    </CustomLink>
-                  </Space>
-                </>
-              }
-            />
-            <TabsContainer>
-              {statPeriods.map((tab) => {
-                return (
-                  <Tab
-                    key={tab.period}
-                    tabId={tab.period}
-                    handleClick={handleButtonClick}
-                    isActive={tab.isActive}
-                    content={tab.tabText}
-                  />
-                )
-              })}
-            </TabsContainer>
+      {overallUserAnalytics ? (
+        <BasicContainer>
+          <HeaderPageDescription
+            content={
+              <Space>
+                Select a time period for data comparison.
+                <CustomLink href="https://maikyman.notion.site/Tendency-feature-7e3d389bb6c941b289bff7192f2e8df0?pvs=4">
+                  Get more details
+                </CustomLink>
+              </Space>
+            }
+          />
+          <TabsContainer>
+            {statPeriods.map((tab) => (
+              <Tab
+                key={tab.period.toString()}
+                tabId={tab.period.toString()}
+                handleClick={() => handleButtonClick(tab.period)}
+                isActive={tab.isActive}
+                content={tab.tabText}
+              />
+            ))}
+          </TabsContainer>
+          {activeTab && (
             <UserAnalytics
-              // There should be a different format of user analytics. Ther same as for period. Re-do
-              periodType={getActiveTab(statPeriods)}
-              userAnalytics={getCurrentStat(statPeriods)}
-              changesInPercentage={calculateStatisticDifferences(
-                getCurrentStat(statPeriods)
-              )}
+              periodType={activeTab.period}
+              userAnalytics={activeTab.data}
+              overallUserAnalytics={overallUserAnalytics}
             />
-            <CastsStatContainer>
-              <Title
-                fontSize="16px"
-                withTooltip={true}
-                tooltipText="All your casts, which can be filtered by different metrics">
-                Total casts
-              </Title>
-              <CastsStatistic casts={userAnalytics.currentCasts} />
-            </CastsStatContainer>
-          </BasicContainer>
-        </>
+          )}
+
+          <CastsStatContainer>
+            <Title
+              fontSize="16px"
+              withTooltip={true}
+              tooltipText="All your casts, which can be filtered by different metrics">
+              Total casts
+            </Title>
+            <CastsStatistic />
+          </CastsStatContainer>
+        </BasicContainer>
       ) : (
         <span>Loading user data...</span>
       )}

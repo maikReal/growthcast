@@ -1,11 +1,6 @@
 import type { ReactNode } from "react"
 import styled from "styled-components"
 
-interface DescriptionProps {
-  fontSize?: string
-  alignText?: string
-}
-
 export const Description = ({
   children,
   fontSize,

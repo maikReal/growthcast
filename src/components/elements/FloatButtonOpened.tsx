@@ -1,6 +1,6 @@
 import styled from "styled-components"
 
-import { ScreenState } from "~Context/AppContext"
+import { ScreenState } from "~Context/app-context"
 
 import { SecretCastIcon, ThreadIcon } from "./Icons"
 

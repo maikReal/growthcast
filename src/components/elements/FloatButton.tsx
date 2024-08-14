@@ -1,7 +1,7 @@
 import { ConfigProvider, FloatButton } from "antd"
 import React from "react"
 
-import { ScreenState } from "~Context/AppContext"
+import { ScreenState } from "~Context/app-context"
 
 import { OpenedFloatButton } from "./FloatButtonOpened"
 import { CloseIcon, RocketIcon } from "./Icons"

@@ -2,7 +2,6 @@ import styled from "styled-components"
 
 import { ExternalButtonIcon } from "./Icons"
 
-// TODO: Add hover
 export const WideButton = ({ isExternal, btnText, actionHandler }) => {
   return (
     <Container onClick={actionHandler}>

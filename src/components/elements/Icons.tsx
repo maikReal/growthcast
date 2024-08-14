@@ -1,8 +1,4 @@
-import type { IconsMapperInterface } from "~types"
-
 import "../../styles/styles.module.css"
-
-import styled from "styled-components"
 
 export const ExternalButtonIcon = () => {
   return (

@@ -4,7 +4,7 @@ import { BasicContainer } from "~components/containers/BasicContainer"
 import { Description } from "~components/elements/DescriptionComponent"
 import { PrimaryButton } from "~components/elements/PrimaryButton"
 import { Title } from "~components/elements/TitleComponent"
-import { ScreenState, useApp } from "~Context/AppContext"
+import { ScreenState, useApp } from "~Context/app-context"
 
 export const SuccessScreen = ({ title, description }) => {
   const { setScreen } = useApp()

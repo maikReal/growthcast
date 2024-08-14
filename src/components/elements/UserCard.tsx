@@ -1,6 +1,6 @@
 import styled from "styled-components"
 
-import type { UserInfoProp } from "~utils/openrankSuggestions"
+import type { UserInfoProp } from "~utils/openrank-suggestions"
 
 import { Description } from "./DescriptionComponent"
 import { PrimaryButton } from "./PrimaryButton"

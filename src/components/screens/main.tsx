@@ -1,15 +1,13 @@
-import { ScreenState, useApp } from "~Context/AppContext"
+import { ScreenState, useApp } from "~Context/app-context"
 
 import { UserHome } from "./home"
 import { Settings } from "./settings"
 import { Signin } from "./signin"
-import { SuccessScreen } from "./SuccessScreen"
-import { ThreadView } from "./ThreadView"
+import { SuccessScreen } from "./success-screen"
+import { ThreadView } from "./thread-view"
 
 export function AppMain() {
   const { screen } = useApp()
-
-  console.log("[DEBUG - screens/Main.tsx] Current screen:", screen)
 
   if (screen === ScreenState.Signin) {
     return <Signin />

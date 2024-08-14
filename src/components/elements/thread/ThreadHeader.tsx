@@ -2,12 +2,20 @@ import { ConfigProvider, Select } from "antd"
 import { useEffect, useState } from "react"
 import styled from "styled-components"
 
-import type { ChannelSelect } from "~types"
 import { sendRequestSignal } from "~utils/helpers"
 
 import { PrimaryButton } from "../PrimaryButton"
 
 export const ThreadHeader = ({ handleCastThread, fid, setSelectedChannel }) => {
+  const LOCAL_VAR_CHANNELS_FETCH_DATE = process.env
+    .PLASMO_PUBLIC_LOCAL_VAR_CHANNELS_FETCH_DATE
+    ? process.env.PLASMO_PUBLIC_LOCAL_VAR_CHANNELS_FETCH_DATE
+    : "channelsLastFetchTime"
+  const LOCAL_VAR_CHANNELS_LIST = process.env
+    .PLASMO_PUBLIC_LOCAL_VAR_CHANNELS_LIST
+    ? process.env.PLASMO_PUBLIC_LOCAL_VAR_CHANNELS_LIST
+    : "channels"
+
   const [channels, setChannels] = useState<Array<ChannelSelect>>(null)
   const [isSearchUsed, setIsSearchUsed] = useState(false)
 
@@ -31,19 +39,21 @@ export const ThreadHeader = ({ handleCastThread, fid, setSelectedChannel }) => {
         })
       )
 
-      localStorage.setItem("channelsLastFetchTime", Date.now().toString())
-      localStorage.setItem("channels", JSON.stringify(apiChannels))
+      localStorage.setItem(LOCAL_VAR_CHANNELS_FETCH_DATE, Date.now().toString())
+      localStorage.setItem(LOCAL_VAR_CHANNELS_LIST, JSON.stringify(apiChannels))
     }
 
     if (fid) {
-      const lastFetchTime = localStorage.getItem("channelsLastFetchTime")
+      const lastFetchTime = localStorage.getItem(LOCAL_VAR_CHANNELS_FETCH_DATE)
       const now = Date.now()
       const apiRequestTimeout = 60 * 60 * 1000 // 30 minutes in milliseconds
 
       if (!lastFetchTime || now - parseInt(lastFetchTime) > apiRequestTimeout) {
         updateWarpcastChannels()
       } else {
-        const storedChannels = JSON.parse(localStorage.getItem("channels"))
+        const storedChannels = JSON.parse(
+          localStorage.getItem(LOCAL_VAR_CHANNELS_LIST)
+        )
         if (storedChannels) {
           const formattedChannels = storedChannels.map((channel) => ({
             label: channel.channelName,

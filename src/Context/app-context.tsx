@@ -5,22 +5,15 @@ import {
   useEffect,
   useMemo,
   useState,
-  type FC
+  type FC,
+  type ReactNode
 } from "react"
 
 import { useStorage } from "@plasmohq/storage/hook"
 
-import { StatPeriods } from "~components/screens/home"
-import type { AppContextInterface, Props, UserInfo, UserStat } from "~types"
-import { userAnalyticsHandler } from "~utils/analyticsImporter"
-import AuthService from "~utils/authService"
-import { isSameDate, sendRequestSignal } from "~utils/helpers"
-import { getSuggestions, type UserInfoProp } from "~utils/openrankSuggestions"
-import {
-  getAndSetStreaks,
-  isCastedToday,
-  startTrackingUsersCasts
-} from "~utils/streaksProcessing"
+import { AnalyticsImporter } from "~utils/analytics-importer"
+import AuthService from "~utils/auth-service"
+import { Logger } from "~utils/logger"
 
 // [...] - is responsible for the type of a screen in the app.
 // This type is used in the code to understand where we need to show a specific screen
@@ -33,22 +26,16 @@ export enum ScreenState {
   ThreadSentSuccess = "[secondary_screen]-threadSent"
 }
 
-export interface StatisticForPeriod {
-  currentCasts: UserStat[]
-  currentTotalCasts: number
-  currentTotalLikes: number
-  currentTotalRecasts: number
-  currentTotalReplies: number
-  previousCasts: UserStat[]
-  previousTotalCasts: number
-  previousTotalLikes: number
-  previousTotalRecasts: number
-  previousTotalReplies: number
+export enum StatPeriods {
+  all = "all",
+  compareWith7Days = 7,
+  compareWith14Days = 14,
+  compareWith30Days = 30
 }
 
 const AppContext = createContext<AppContextInterface | null>(null)
 
-export const AppProvider: FC<Props> = ({ children }) => {
+export const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [screen, setScreen] = useState<ScreenState>(ScreenState.Signin)
   const [displayName, setDisplayName] = useState<string | null>(null)
   const [pfp, setPfp] = useState<string | null>(null)
@@ -57,7 +44,10 @@ export const AppProvider: FC<Props> = ({ children }) => {
   const [loading, setLoading] = useState(true)
   const [isBackendLoggedIn, setIsBackendLoggedIn] = useState(false)
 
-  const [userAnalytics, setUserAnalytics] = useState<UserStat | null>(null)
+  let analyticalManager: AnalyticsImporter | null = null
+
+  const [overallUserAnalytics, setOverallUserAnalytics] =
+    useState<UserResponse | null>(null)
   const [userAnalytic7Days, setUserAnalytics7Days] =
     useState<StatisticForPeriod | null>(null)
   const [userAnalytics14Days, setUserAnalytics14Days] =
@@ -70,29 +60,8 @@ export const AppProvider: FC<Props> = ({ children }) => {
     null
   )
 
-  // Backward compatibility
-  // Change the naming that we're using in Growthcast
-  // const newUserDataNaming = localStorage.getItem(
-  //   process.env.PLASMO_PUBLIC_GROWTHCAST_USER_DATA
-  // )
-  // const oldUserDataNaming = localStorage.getItem(
-  //   process.env.PLASMO_PUBLIC_GROWTHCAST_USER_DATA_OLD_NAMING
-  // )
-
-  // if (!newUserDataNaming && oldUserDataNaming) {
-  //   localStorage.setItem(
-  //     process.env.PLASMO_PUBLIC_GROWTHCAST_USER_DATA,
-  //     oldUserDataNaming
-  //   )
-
-  //   setUser(JSON.parse(oldUserDataNaming))
-  // }
-
-  console.log(
-    "[DEBUG] Current state in the AppContext.tsx: ",
-    user,
-    fid,
-    signerUuid
+  Logger.logInfo(
+    `Current state in the AppContext.tsx:\n user: ${user}\nfid: ${fid}\nsignerUuid: ${signerUuid}`
   )
 
   const lookupUser = useCallback(async () => {
@@ -100,16 +69,17 @@ export const AppProvider: FC<Props> = ({ children }) => {
       try {
         setFid(user.fid.toString())
         setSignerUuid(user.signerUuid.toString())
+
         try {
-          console.log("Trying to login...")
+          Logger.logInfo("Trying to login...")
           await AuthService.login(user.signerUuid.toString())
           setIsBackendLoggedIn(true)
         } catch (err) {
-          console.error(err)
+          Logger.logError(`Unable to login: ${err}`)
         }
         setLoading(false)
       } catch (err) {
-        console.log(err)
+        Logger.logError(`Unable to set data for the context: ${err}`)
       }
     }
   }, [user])
@@ -121,50 +91,42 @@ export const AppProvider: FC<Props> = ({ children }) => {
       // TODO: Add later to manual analytics update.
       // User clicks on a button and we make a request to update data
 
-      // Get casts analytics per user for all his time
-      // Analytics for the whole time
-      await userAnalyticsHandler(
-        {
-          fid: user.fid,
-          analyticsHandler: setUserAnalytics
-        },
-        StatPeriods.all
-      )
+      let isFetched = false
 
-      // Get casts analytics per user for last 7 days
-      await userAnalyticsHandler(
-        {
-          fid: user.fid,
-          analyticsHandler: setUserAnalytics7Days
-        },
-        StatPeriods.compareWith7Days
-      )
+      do {
+        isFetched = await analyticalManager.isUserHistoricalDataFetched()
+        if (isFetched) {
+          // Fetch analytica for the 7 days period
+          await analyticalManager.getPeriodsAnalytics(
+            setUserAnalytics7Days,
+            StatPeriods.compareWith7Days
+          )
 
-      // Get casts analytics per user for last 30 days
-      await userAnalyticsHandler(
-        {
-          fid: user.fid,
-          analyticsHandler: setUserAnalytics14Days
-        },
-        StatPeriods.compareWith14Days
-      )
+          // Fetch analytica for the 14 days period
+          await analyticalManager.getPeriodsAnalytics(
+            setUserAnalytics14Days,
+            StatPeriods.compareWith14Days
+          )
 
-      // Get casts analytics per user for last 90 days
-      await userAnalyticsHandler(
-        {
-          fid: user.fid,
-          analyticsHandler: setUserAnalytics30Days
-        },
-        StatPeriods.compareWith30Days
-      )
+          // Fetch analytica for the 30 days period
+          await analyticalManager.getPeriodsAnalytics(
+            setUserAnalytics30Days,
+            StatPeriods.compareWith30Days
+          )
+
+          // Fetch overall user's analytics for the whole time
+          await analyticalManager.fetchOverallAnalytics(setOverallUserAnalytics)
+        }
+      } while (!isFetched)
     }
 
     if (user && isBackendLoggedIn) {
-      console.log(
-        "[DEBUG - AppContext.tsx] Trying to fetch anayltics: ",
-        user,
-        userAnalytics
+      analyticalManager = new AnalyticsImporter(user.fid)
+
+      Logger.logInfo(
+        `Fetching user (fid: ${fid}) overall and comparison analytics...`
       )
+
       handleUserAnalytics()
     }
   }, [lookupUser, isBackendLoggedIn])
@@ -196,8 +158,8 @@ export const AppProvider: FC<Props> = ({ children }) => {
       loading,
       setIsBackendLoggedIn,
       isBackendLoggedIn,
-      userAnalytics,
-      setUserAnalytics,
+      overallUserAnalytics,
+      setOverallUserAnalytics,
       userAnalytic7Days,
       setUserAnalytics7Days,
       userAnalytics14Days,
@@ -212,7 +174,7 @@ export const AppProvider: FC<Props> = ({ children }) => {
       signerUuid,
       fid,
       isBackendLoggedIn,
-      userAnalytics,
+      overallUserAnalytics,
       userAnalytic7Days,
       userAnalytics14Days,
       userAnalytics30Days

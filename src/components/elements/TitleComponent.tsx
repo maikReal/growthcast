@@ -4,12 +4,6 @@ import styled from "styled-components"
 import { CustomLink } from "./Link"
 import { BasicTootlip } from "./Tooltips"
 
-interface TitleProps {
-  fontSize?: string
-}
-
-type additonalIconsTypes = "share" | null
-
 export const Title = ({
   children,
   fontSize,
@@ -72,15 +66,3 @@ const ShareFrameText = styled.span`
   font-size: 12px;
   color: white;
 `
-
-{
-  /* <button> */
-}
-//         <a
-//           href={`https://warpcast.com/~/compose?${new URLSearchParams({
-//             text: `Simple text`,
-//             "embeds[]": `${process.env.PLASMO_PUBLIC_DOMAIN}/frames/streaks/${fid}`
-//           }).toString()}`}
-//         />
-//         Share Frame
-//       </button>

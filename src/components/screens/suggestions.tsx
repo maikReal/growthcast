@@ -4,7 +4,8 @@ import styled from "styled-components"
 
 import { Title } from "~components/elements/TitleComponent"
 import { UserCard } from "~components/elements/UserCard"
-import { getSuggestions, type UserInfoProp } from "~utils/openrankSuggestions"
+import { Logger } from "~utils/logger"
+import { getSuggestions, type UserInfoProp } from "~utils/openrank-suggestions"
 
 export const OpenrankSuggestions = () => {
   const userData =
@@ -17,9 +18,8 @@ export const OpenrankSuggestions = () => {
   useEffect(() => {
     const updateFidSuggestions = async () => {
       const listOfSuggestions = await getSuggestions(fid)
-      console.log(
-        "[DEBUG - sreens/suggestions.tsx] Received non-null suggestions",
-        listOfSuggestions ? true : false
+      Logger.logInfo(
+        `Received non-null suggestions: ${listOfSuggestions ? true : false}`
       )
 
       setFidSuggestions(listOfSuggestions)
@@ -87,7 +87,6 @@ export const addSuggestionsSection = () => {
     const element = document.getElementById(suggestionsSectionName)
     if (element) {
       element.parentNode?.removeChild(element)
-      console.log(`Element with ID '${suggestionsSectionName}' removed.`)
     }
   }
 

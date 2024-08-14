@@ -1,3 +1,5 @@
+import { Logger } from "~utils/logger"
+
 let lastKnownValue = localStorage.getItem("user") // get the current value of "user" from the localStorage
 let isAuth =
   lastKnownValue && lastKnownValue != "null" && lastKnownValue != null
@@ -20,10 +22,8 @@ function checkLocalStorageChange() {
 }
 
 // Check the cahnges every second until we get changed data
-console.log(
-  "[DEBUG - content.ts] Checking if a user is logged in... Current value:",
-  isAuth,
-  lastKnownValue
+Logger.logInfo(
+  `Checking if a user is logged in... \nisAuth: ${isAuth}\nlastKnownValue: ${lastKnownValue}`
 )
 
 function delay(ms: number) {
@@ -41,7 +41,9 @@ async function waitForAuth() {
 }
 
 ;(async () => {
-  console.log("[DEBUG - content.ts] Checking if a local storage changed...")
+  Logger.logInfo("Checking if a local storage changed...")
   await waitForAuth()
-  console.log("[DEBUG - content.ts] User is authenticated!", isAuth)
+  Logger.logInfo(
+    `[DEBUG - content.ts] User is authenticated!\nisAuth: ${isAuth}`
+  )
 })()

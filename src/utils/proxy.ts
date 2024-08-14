@@ -1,321 +1,116 @@
-import type { Channel, ThreadData, UserStat } from "~types"
+import AuthService from "./auth-service"
+import { Logger } from "./logger"
+import type { UserInfoProp } from "./openrank-suggestions"
 
-import AuthService from "./authService"
-import type { UserInfoProp } from "./openrankSuggestions"
+type FetchFunction<T> = () => Promise<Response>
 
-export const getCastsByPeriod = async (
-  fid: string,
+async function fetchWithAuth<T>(
+  fetchFunction: FetchFunction<T>,
+  token: string
+): Promise<T> {
+  let response = await fetchFunction()
+
+  if (response.status === 403) {
+    Logger.logInfo(
+      `JWT token is expired, trying to refresh it. Previous error: ${response.status} -> ${response.statusText}`
+    )
+    await AuthService.refreshToken()
+    response = await fetchFunction()
+  }
+
+  if (!response.ok) {
+    Logger.logError(
+      `The request returned a bad HTTP status: ${response.status} -> ${response.statusText}`
+    )
+  }
+
+  return response.json()
+}
+
+function createFetchFunction(
+  url: string,
   token: string,
-  period: string
-) => {
-  const fetchCastsByPeriod = async () => {
-    console.log(
-      "request",
-      `${process.env.PLASMO_PUBLIC_DOMAIN}/api/db/get-stats-by-period/${fid}?period=${period}`
-    )
-    return await fetch(
-      `${process.env.PLASMO_PUBLIC_DOMAIN}/api/db/get-stats-by-period/${fid}?period=${period}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    )
-  }
-
-  let response = await fetchCastsByPeriod()
-
-  console.log("My response: ", response)
-
-  if (response.status === 403) {
-    console.log(
-      `[DEBUG - utils/proxy.ts] JWT token is expired during the request to /api/db/get-stats-by-period/${fid}?period=${period}, trying to refresh it. Previous error: `,
-      response.status,
-      response.statusText
-    )
-    await AuthService.refreshToken()
-    response = await fetchCastsByPeriod()
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      `[ERROR - utils/proxy.ts] The external method /api/stat/db/get-stats-by-period/${fid}?period=${period} returned a bad HTTP status: ${response.status} -> ${response.statusText}`
-    )
-  }
-  const data: UserStat = await response.json()
-
-  return data
-}
-
-export const getUserAnalytics = async (fid: string, token: string) => {
-  const fetchAnalytics = async () => {
-    return await fetch(`${process.env.PLASMO_PUBLIC_DOMAIN}/api/stat/${fid}`, {
+  method: string = "GET",
+  body?: any
+): FetchFunction<any> {
+  return () => {
+    console.log("request", url)
+    return fetch(url, {
+      method,
+      body: body ? JSON.stringify(body) : undefined,
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
+        "Content-Type": body ? "application/json" : undefined
       }
     })
   }
-
-  let response = await fetchAnalytics()
-
-  if (response.status === 403) {
-    console.log(
-      `[DEBUG - utils/proxy.ts] JWT token is expired during the request to /api/stat/${fid}, trying to refresh it. Previous error: `,
-      response.status,
-      response.statusText
-    )
-    await AuthService.refreshToken()
-    response = await fetchAnalytics()
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      `[ERROR - utils/proxy.ts] The external method /api/stat/${fid} returned a bad HTTP status: ${response.status} -> ${response.statusText}`
-    )
-  }
-  const data: UserStat = await response.json()
-
-  return data
 }
 
-export const castThread = async (data: ThreadData, token: string) => {
-  const makeThreadCast = async () => {
-    return await fetch(`${process.env.PLASMO_PUBLIC_DOMAIN}/api/thread/`, {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-  }
+export const isUserDataFetched = (fid: string, token: string) =>
+  fetchWithAuth<{ isExist: boolean | null; isFetched: boolean | null }>(
+    createFetchFunction(
+      `${process.env.PLASMO_PUBLIC_DOMAIN}/api/v2/is-existing/${fid}?is-fetched=true`,
+      token
+    ),
+    token
+  )
 
-  let response = await makeThreadCast()
+export const getCastsByPeriod = (fid: string, token: string, period: string) =>
+  fetchWithAuth<StatisticForPeriod>(
+    createFetchFunction(
+      `${process.env.PLASMO_PUBLIC_DOMAIN}/api/v2/get-fid-comparison-analytics/${fid}${period ? `?period=${period}` : ""}`,
+      token
+    ),
+    token
+  )
 
-  if (response.status === 403) {
-    console.log(
-      `[DEBUG - utils/proxy.ts] JWT token is expired during the request to /api/thread, trying to refresh it. Previous error: `,
-      response.status,
-      response.statusText
-    )
-    await AuthService.refreshToken()
-    response = await makeThreadCast()
-  }
+export const getPaginatedCasts = (
+  fid: string,
+  pageToken: string,
+  requestToken: string
+) =>
+  fetchWithAuth<PaginatedCasts>(
+    createFetchFunction(
+      `${process.env.PLASMO_PUBLIC_DOMAIN}/api/v2/get-casts/${fid}${pageToken ? `?pageToken=${pageToken}` : ""}`,
+      requestToken
+    ),
+    requestToken
+  )
 
-  if (!response.ok) {
-    throw new Error(
-      `[DEBUG - utils/proxy.ts] The external method /api/thread/ returned a bad HTTP status: ${response.status} -> ${response.statusText}`
-    )
-  }
-  const threadPostResponse: Promise<{ frameLink: string; castHash: string }> =
-    await response.json()
+export const getOverallAnalytics = (fid: string, token: string) =>
+  fetchWithAuth<UserResponse>(
+    createFetchFunction(
+      `${process.env.PLASMO_PUBLIC_DOMAIN}/api/v2/get-overall-stat/${fid}`,
+      token
+    ),
+    token
+  )
 
-  return threadPostResponse
-}
+export const castThread = (data: ThreadData, token: string) =>
+  fetchWithAuth<{ frameLink: string; castHash: string }>(
+    createFetchFunction(
+      `${process.env.PLASMO_PUBLIC_DOMAIN}/api/thread/`,
+      token,
+      "POST",
+      data
+    ),
+    token
+  )
 
-export const getChannels = async (fid: string, token: string) => {
-  const fetchChannels = async () => {
-    return await fetch(
+export const getChannels = (fid: string, token: string) =>
+  fetchWithAuth<Channel[]>(
+    createFetchFunction(
       `${process.env.PLASMO_PUBLIC_DOMAIN}/api/channels/${fid}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    )
-  }
+      token
+    ),
+    token
+  )
 
-  let response = await fetchChannels()
-
-  if (response.status === 403) {
-    console.log(
-      `[DEBUG - utils/proxy.ts] JWT token is expired during the request to /api/channels/${fid}, trying to refresh it. Previous error: `,
-      response.status,
-      response.statusText
-    )
-    await AuthService.refreshToken()
-    response = await fetchChannels()
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      `[DEBUG - utils/proxy.ts] The external method /api/channels/${fid} returned a bad HTTP status: ${response.status} -> ${response.statusText}`
-    )
-  }
-  const data: Array<Channel> = await response.json()
-
-  return data
-}
-
-// Openrank recommendations
-
-export const getSuggestionsByFid = async (fid: string, token: string) => {
-  const fetchSuggestions = async () => {
-    return await fetch(
+export const getSuggestionsByFid = (fid: string, token: string) =>
+  fetchWithAuth<UserInfoProp[]>(
+    createFetchFunction(
       `${process.env.PLASMO_PUBLIC_DOMAIN}/api/power-users/${fid}?filter=all`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    )
-  }
-
-  let response = await fetchSuggestions()
-
-  if (response.status === 403) {
-    console.log(
-      `[DEBUG - utils/proxy.ts] JWT token is expired during the request to /api/power-users/${fid}, trying to refresh it. Previous error: `,
-      response.status,
-      response.statusText
-    )
-    await AuthService.refreshToken()
-    response = await fetchSuggestions()
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      `[DEBUG - utils/proxy.ts] The external method /api/power-users/${fid} returned a bad HTTP status: ${response.status} -> ${response.statusText}`
-    )
-  }
-  const data: Array<UserInfoProp> = await response.json()
-
-  return data
-}
-
-// Streaks
-
-export const getNumberOfStreaks = async (fid: string, token: string) => {
-  const fetchSuggestions = async () => {
-    return await fetch(
-      `${process.env.PLASMO_PUBLIC_DOMAIN}/api/webhook/get-fid-streaks/${fid}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    )
-  }
-
-  let response = await fetchSuggestions()
-
-  if (response.status === 403) {
-    console.log(
-      `[DEBUG - utils/proxy.ts] JWT token is expired during the request to /api/webhook/get-fid-streaks/${fid}, trying to refresh it. Previous error: `,
-      response.status,
-      response.statusText
-    )
-    await AuthService.refreshToken()
-    response = await fetchSuggestions()
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      `[DEBUG - utils/proxy.ts] The external method /api/webhook/get-fid-streaks/${fid} returned a bad HTTP status: ${response.status} -> ${response.statusText}`
-    )
-  }
-  const data: number = await response.json()
-
-  return data
-}
-
-export const trackFidCasts = async (fid: string, token: string) => {
-  const fetchSuggestions = async () => {
-    return await fetch(
-      `${process.env.PLASMO_PUBLIC_DOMAIN}/api/webhook/start-tracking-fid/${fid}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    )
-  }
-
-  let response = await fetchSuggestions()
-
-  if (response.status === 403) {
-    console.log(
-      `[DEBUG - utils/proxy.ts] JWT token is expired during the request to /api/webhook/start-tracking-fid/${fid}, trying to refresh it. Previous error: `,
-      response.status,
-      response.statusText
-    )
-    await AuthService.refreshToken()
-    response = await fetchSuggestions()
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      `[DEBUG - utils/proxy.ts] The external method /api/webhook/start-tracking-fid/${fid} returned a bad HTTP status: ${response.status} -> ${response.statusText}`
-    )
-  }
-  const data: boolean = await response.json()
-
-  return data
-}
-
-export const isFidCasted = async (fid: string, token: string) => {
-  const fetchSuggestions = async () => {
-    return await fetch(
-      `${process.env.PLASMO_PUBLIC_DOMAIN}/api/webhook/is-casted-today/${fid}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    )
-  }
-
-  let response = await fetchSuggestions()
-
-  if (response.status === 403) {
-    console.log(
-      `[DEBUG - utils/proxy.ts] JWT token is expired during the request to /api/webhook/is-casted-today/${fid}, trying to refresh it. Previous error: `,
-      response.status,
-      response.statusText
-    )
-    await AuthService.refreshToken()
-    response = await fetchSuggestions()
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      `[DEBUG - utils/proxy.ts] The external method /api/webhook/is-casted-today/${fid} returned a bad HTTP status: ${response.status} -> ${response.statusText}`
-    )
-  }
-  const data: boolean = await response.json()
-
-  return data
-}
-
-export const isFidCastedPreviousWeeks = async (fid: string, token: string) => {
-  const fetchSuggestions = async () => {
-    return await fetch(
-      `${process.env.PLASMO_PUBLIC_DOMAIN}/api/webhook/is-casted-previously/${fid}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    )
-  }
-
-  let response = await fetchSuggestions()
-
-  if (response.status === 403) {
-    console.log(
-      `[DEBUG - utils/proxy.ts] JWT token is expired during the request to /api/webhook/is-casted-previously/${fid}, trying to refresh it. Previous error: `,
-      response.status,
-      response.statusText
-    )
-    await AuthService.refreshToken()
-    response = await fetchSuggestions()
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      `[DEBUG - utils/proxy.ts] The external method /api/webhook/is-casted-previously/${fid} returned a bad HTTP status: ${response.status} -> ${response.statusText}`
-    )
-  }
-  const data: boolean = await response.json()
-
-  return data
-}
+      token
+    ),
+    token
+  )

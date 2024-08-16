@@ -1,9 +1,5 @@
 import styled from "styled-components"
 
-interface TabProps {
-  isActive: boolean
-}
-
 export const Tab = ({
   tabId,
   isActive,
